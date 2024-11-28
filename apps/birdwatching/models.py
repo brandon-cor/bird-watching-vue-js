@@ -33,7 +33,7 @@ db.define_table(
     Field("observation_date", "date", notnull=True, label="Observation Date"),
     Field("start_time", "time", notnull=True, label="Time Observations Started"),
     Field("observer_id", "string", notnull=True, label="Observer ID"),
-    Field("duration_minutes", "integer", requires=IS_INT_IN_RANGE(1, None), label="Duration (Minutes)"),
+    Field("duration_minutes", "double", label="Duration (Minutes)"),
 )
 
 # Define the sightings table
@@ -41,35 +41,50 @@ db.define_table(
     "sightings",
     Field("checklist_id", "reference checklists", notnull=True, label="Checklist ID"),
     Field("species_id", "reference species", notnull=True, label="Species ID"),
-    Field("observation_count", "integer", requires=IS_INT_IN_RANGE(1, None), label="Observation Count"),
+    Field("observation_count", "double", requires=IS_FLOAT_IN_RANGE(1, None), label="Observation Count"),
 )
 
 #species: order of values
 #COMMON NAME
 if db(db.species).isempty():
-    with open('species.csv', 'r') as f:
+    with open('apps/birdwatching/species.csv', 'r') as f:
         reader = csv.reader(f)
         for row in reader:
             db.species.insert(name=row[0])
             
 #checklist: order of values
 #SAMPLING EVENT IDENTIFIER,LATITUDE,LONGITUDE,OBSERVATION DATE,TIME OBSERVATIONS STARTED,OBSERVER ID,DURATION MINUTES
-if db(db.checklist).isempty():
-    with open('species.csv', 'r') as f:
+# Import checklists: order of values - SAMPLING EVENT IDENTIFIER,LATITUDE,LONGITUDE,OBSERVATION DATE,TIME OBSERVATIONS STARTED,OBSERVER ID,DURATION MINUTES
+# Import checklists: order of values - SAMPLING EVENT IDENTIFIER,LATITUDE,LONGITUDE,OBSERVATION DATE,TIME OBSERVATIONS STARTED,OBSERVER ID,DURATION MINUTES
+if db(db.checklists).isempty():
+    with open('apps/birdwatching/checklists.csv', 'r') as f:
         reader = csv.reader(f)
+        next(reader)  # Skip the header row
         for row in reader:
-            db.species.insert(sampling_event_id=row[0],
-                                latitude=row[1],
-                                longitude=row[2],
-                                observation_date=row[3],
-                                start_time=row[4], observer_id=row[5], duration_minutes=row[6])
-            
+            try:
+                duration = int(float(row[6])) if row[6].strip() else None
+                if duration is None:
+                    print(f"Skipping row due to missing duration: {row}")
+                    continue
+                db.checklists.insert(
+                    sampling_event_id=row[0],
+                    latitude=float(row[1]),  # Ensure latitude is a float
+                    longitude=float(row[2]),  # Ensure longitude is a float
+                    observation_date=row[3],
+                    start_time=row[4],
+                    observer_id=row[5],
+                    duration_minutes=duration  # Use the validated duration
+                )
+            except ValueError as e:
+                print(f"Skipping row due to error: {row} -> {e}")
+
+
 #sightings: order of values
 #SAMPLING EVENT IDENTIFIER,COMMON NAME,OBSERVATION COUNT
 if db(db.sightings).isempty():
-    with open('sightings.csv', 'r') as f:
+    with open('apps/birdwatching/sightings.csv', 'r') as f:
         reader = csv.reader(f)
         for row in reader:
-            db.species.insert(checklist_id=row[0], species_id=row[1], observation_count=row[2])
+            db.sightings.insert(checklist_id=row[0], species_id=row[1], observation_count=row[2])
 
 db.commit()
