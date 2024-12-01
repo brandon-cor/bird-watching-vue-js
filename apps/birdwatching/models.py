@@ -39,37 +39,56 @@ db.define_table(
 # Define the sightings table
 db.define_table(
     "sightings",
-    Field("checklist_id", "reference checklists", notnull=True, label="Checklist ID"),
-    Field("species_id", "reference species", notnull=True, label="Species ID"),
+    Field("sampling_event_identifier", "string", notnull=True, label="Sampling Event ID"),
+    Field("common_name", "string", notnull=True, label="Common Name"),
     Field("observation_count", "integer", requires=IS_INT_IN_RANGE(1, None), label="Observation Count"),
 )
 
-#species: order of values
-#COMMON NAME
-if db(db.species).isempty():
-    with open('species.csv', 'r') as f:
-        reader = csv.reader(f)
-        for row in reader:
-            db.species.insert(name=row[0])
-            
-#checklist: order of values
-#SAMPLING EVENT IDENTIFIER,LATITUDE,LONGITUDE,OBSERVATION DATE,TIME OBSERVATIONS STARTED,OBSERVER ID,DURATION MINUTES
-if db(db.checklist).isempty():
-    with open('species.csv', 'r') as f:
-        reader = csv.reader(f)
-        for row in reader:
-            db.species.insert(sampling_event_id=row[0],
-                                latitude=row[1],
-                                longitude=row[2],
-                                observation_date=row[3],
-                                start_time=row[4], observer_id=row[5], duration_minutes=row[6])
-            
-#sightings: order of values
-#SAMPLING EVENT IDENTIFIER,COMMON NAME,OBSERVATION COUNT
-if db(db.sightings).isempty():
-    with open('sightings.csv', 'r') as f:
-        reader = csv.reader(f)
-        for row in reader:
-            db.species.insert(checklist_id=row[0], species_id=row[1], observation_count=row[2])
-
 db.commit()
+
+# #species: order of values
+# #COMMON NAME
+# if db(db.species).isempty():
+#     with open('apps/birdwatching/species.csv', 'r') as f:
+#         reader = csv.reader(f)
+#         next(reader)  # Skip the header row
+#         for row in reader:
+#             db.species.insert(name=row[0])
+            
+# #checklist: order of values
+# #SAMPLING EVENT IDENTIFIER,LATITUDE,LONGITUDE,OBSERVATION DATE,TIME OBSERVATIONS STARTED,OBSERVER ID,DURATION MINUTES
+# if db(db.checklists).isempty():
+#     with open('apps/birdwatching/checklists.csv', 'r') as f:
+#         reader = csv.reader(f)
+#         next(reader)  # Skip the header row
+#         for row in reader:
+#             try:
+#                 db.checklists.insert(
+#                 sampling_event_id=row[0] if row[0] else None,
+#                 latitude=float(row[1]) if row[1] else None,  # Ensure this is a float
+#                 longitude=float(row[2]) if row[2] else None,  # Ensure this is a float
+#                 observation_date=row[3] if row[3] else None,
+#                 start_time=row[4] if row[4] else "00:00:00",
+#                 observer_id=row[5] if row[5] else None,
+#                 duration_minutes=int(float(row[6])) if row[6] else None  # Convert duration_minutes to an integer or set to None if empty
+#             )
+#             except Exception as e:
+#                 print(f"Error inserting row: {row}")
+#                 print(e)
+# #sightings: order of values
+# #SAMPLING EVENT IDENTIFIER,COMMON NAME,OBSERVATION COUNT
+# if db(db.sightings).isempty():
+#     with open('apps/birdwatching/sightings.csv', 'r') as f:
+#         reader = csv.reader(f)
+#         next(reader)  # Skip the header row
+#         for row in reader:
+#             try:                
+#                 # Insert into sightings table
+#                 db.sightings.insert(
+#                     sampling_event_identifier=row[0],  # Use integer ID
+#                     common_name=row[1],     # Use integer ID
+#                     observation_count=int(row[2]) if row[2] != 'X' else 0  # Ensure count is an integer, set to 0 if 'X'
+#                 )
+#             except Exception as e:
+#                 print(f"Error inserting row {row}: {e}")
+# db.commit()
