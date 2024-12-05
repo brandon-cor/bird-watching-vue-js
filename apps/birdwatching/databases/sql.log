@@ -1,0 +1,103 @@
+timestamp: 2024-12-04T17:18:23.079711
+CREATE TABLE "py4web_session"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "rkey" CHAR(512),
+    "rvalue" TEXT,
+    "expiration" INTEGER,
+    "created_on" TIMESTAMP,
+    "expires_on" TIMESTAMP
+);
+success!
+timestamp: 2024-12-04T17:18:23.086694
+CREATE TABLE "auth_user"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "email" CHAR(512) UNIQUE,
+    "password" CHAR(512),
+    "first_name" CHAR(512),
+    "last_name" CHAR(512),
+    "sso_id" CHAR(512),
+    "action_token" CHAR(512),
+    "last_password_change" TIMESTAMP,
+    "past_passwords_hash" TEXT
+);
+success!
+timestamp: 2024-12-04T17:18:23.091581
+CREATE TABLE "auth_user_tag_groups"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "tagpath" CHAR(512),
+    "record_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE  
+);
+success!
+timestamp: 2024-12-04T17:18:23.097086
+CREATE TABLE "species"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "name" CHAR(512) NOT NULL UNIQUE
+);
+success!
+timestamp: 2024-12-04T17:18:23.101969
+CREATE TABLE "checklists"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "sampling_event_id" CHAR(512) NOT NULL UNIQUE,
+    "latitude" DOUBLE NOT NULL,
+    "longitude" DOUBLE NOT NULL,
+    "observation_date" DATE NOT NULL,
+    "start_time" TIME NOT NULL,
+    "observer_id" CHAR(512) NOT NULL,
+    "duration_minutes" INTEGER
+);
+success!
+timestamp: 2024-12-04T17:18:23.104908
+CREATE TABLE "sightings"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "sampling_event_identifier" CHAR(512) NOT NULL,
+    "common_name" CHAR(512) NOT NULL,
+    "observation_count" INTEGER
+);
+success!
+success!
+timestamp: 2024-12-04T13:58:22.457760
+ALTER TABLE "sightings" ADD "sampling_event_identifier" CHAR(512) NOT NULL;
+timestamp: 2024-12-04T14:00:29.494090
+ALTER TABLE "sightings" ADD "sampling_event_identifier" CHAR(512) NOT NULL;
+timestamp: 2024-12-04T14:00:56.987680
+ALTER TABLE "sightings" ADD "sampling_event_identifier" CHAR(512) NOT NULL;
+timestamp: 2024-12-04T14:02:49.243064
+ALTER TABLE "sightings" ADD "sampling_event_identifier" CHAR(512) NOT NULL;
+timestamp: 2024-12-04T14:03:19.154910
+ALTER TABLE "sightings" ADD "sampling_event_identifier" CHAR(512) NOT NULL;
+timestamp: 2024-12-04T14:07:49.952775
+ALTER TABLE "sightings" ADD "dummy_field" CHAR(512);
+timestamp: 2024-12-04T14:14:39.881498
+CREATE TABLE "sightings_temp"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "dummy_field" CHAR(512)
+);
+success!
+timestamp: 2024-12-04T14:14:39.884135
+ALTER TABLE "sightings" ADD "dummy_field" CHAR(512);
+timestamp: 2024-12-04T14:20:01.022261
+CREATE TABLE "species"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "name" CHAR(512) NOT NULL UNIQUE
+);
+success!
+timestamp: 2024-12-04T14:20:01.023373
+CREATE TABLE "checklists"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "sampling_event_id" CHAR(512) NOT NULL UNIQUE,
+    "latitude" DOUBLE NOT NULL,
+    "longitude" DOUBLE NOT NULL,
+    "observation_date" DATE NOT NULL,
+    "start_time" TIME NOT NULL,
+    "observer_id" CHAR(512) NOT NULL,
+    "duration_minutes" INTEGER
+);
+success!
+timestamp: 2024-12-04T14:20:01.024020
+CREATE TABLE "sightings"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "sampling_event_identifier" CHAR(512) NOT NULL,
+    "common_name" CHAR(512) NOT NULL,
+    "observation_count" INTEGER
+);
+success!
