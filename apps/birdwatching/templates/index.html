@@ -27,7 +27,7 @@
     <!-- Action Buttons -->
     <div class="buttons">
         <a href="birdwatching/checklist" class="button is-primary">Submit Checklist</a>
-        <a href="birdwatching/stats" class="button is-link">My Birding Stats</a>
+        <a href="/birdwatching/stats" class="button is-link">My Birding Stats</a>
         <button @click="fetchStatistics" class="button is-success">Statistics on Region</button>
     </div>
 </div>
@@ -51,5 +51,6 @@
 <!-- Load Google Maps API -->
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAA8lMIJa2_PXy94ZywUWiQjyh6kVT5Hlo&loading=async&libraries=visualization,drawing&callback=initMap"></script>
 </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="js/index.js"></script>
 [[end]]

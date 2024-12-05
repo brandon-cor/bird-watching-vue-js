@@ -46,3 +46,43 @@ def index():
 def my_callback():
     # The return value should be a dictionary that will be sent as JSON.
     return dict(my_value=3)
+
+@action("stats", method=["GET"])
+@action.uses("stats.html", auth.user)
+def stats():
+    return dict()
+
+@action("get_user_stats", method=["GET"])
+@action.uses(db, auth.user)
+def get_user_stats():
+    user_email = auth.current_user.get("email")
+    stats = db.executesql('''
+        SELECT common_name, SUM(observation_count) AS total_count
+        FROM sightings
+        JOIN checklists ON sightings.sampling_event_identifier = checklists.sampling_event_id
+        WHERE checklists.observer_id = ?
+        GROUP BY common_name
+    ''', [user_email])
+    return dict(stats=stats)
+
+@action("get_species_trends", method=["GET"])
+@action.uses(db, auth.user)
+def get_species_trends():
+    species_name = request.params.get("species")
+    user_email = auth.current_user.get("email")
+    trends = db.executesql('''
+        SELECT observation_date, SUM(observation_count) AS count
+        FROM sightings
+        JOIN checklists ON sightings.sampling_event_identifier = checklists.sampling_event_id
+        WHERE checklists.observer_id = ? AND sightings.common_name = ?
+        GROUP BY observation_date
+        ORDER BY observation_date ASC
+    ''', [user_email, species_name])
+    return dict(trends=trends)
+
+@action("search_species", method=["GET"])
+@action.uses(db)
+def search_species():
+    query = request.params.get("q", "")
+    species = db(db.species.name.contains(query)).select().as_list()
+    return dict(species=species)

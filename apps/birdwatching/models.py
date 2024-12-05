@@ -1,6 +1,8 @@
 """
 This file defines the database models
 """
+print("Models.py loaded.")
+
 
 import datetime
 from .common import db, Field, auth
@@ -15,16 +17,14 @@ def get_user_email():
 def get_time():
     return datetime.datetime.utcnow()
 
-
-
-# Define the species table
+# Species table
 db.define_table(
     "species",
     Field("name", "string", unique=True, notnull=True, label="Common Name"),
     format="%(name)s",
 )
 
-# Define the checklists table
+# Checklists table
 db.define_table(
     "checklists",
     Field("sampling_event_id", "string", unique=True, notnull=True, label="Sampling Event ID"),
@@ -36,13 +36,14 @@ db.define_table(
     Field("duration_minutes", "integer", requires=IS_INT_IN_RANGE(1, None), label="Duration (Minutes)"),
 )
 
-# Define the sightings table
+# Sightings table
 db.define_table(
     "sightings",
     Field("sampling_event_identifier", "string", notnull=True, label="Sampling Event ID"),
     Field("common_name", "string", notnull=True, label="Common Name"),
     Field("observation_count", "integer", requires=IS_INT_IN_RANGE(1, None), label="Observation Count"),
 )
+
 
 db.commit()
 
