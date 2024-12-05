@@ -1,4 +1,4 @@
-timestamp: 2024-11-18T19:11:17.469737
+timestamp: 2024-12-04T17:18:23.079711
 CREATE TABLE "py4web_session"(
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
     "rkey" CHAR(512),
@@ -8,7 +8,7 @@ CREATE TABLE "py4web_session"(
     "expires_on" TIMESTAMP
 );
 success!
-timestamp: 2024-11-18T19:11:17.478328
+timestamp: 2024-12-04T17:18:23.086694
 CREATE TABLE "auth_user"(
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
     "email" CHAR(512) UNIQUE,
@@ -21,20 +21,38 @@ CREATE TABLE "auth_user"(
     "past_passwords_hash" TEXT
 );
 success!
-timestamp: 2024-11-18T19:11:17.482525
+timestamp: 2024-12-04T17:18:23.091581
 CREATE TABLE "auth_user_tag_groups"(
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
     "tagpath" CHAR(512),
     "record_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE  
 );
 success!
+timestamp: 2024-12-04T17:18:23.097086
+CREATE TABLE "species"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "name" CHAR(512) NOT NULL UNIQUE
+);
 success!
+timestamp: 2024-12-04T17:18:23.101969
+CREATE TABLE "checklists"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "sampling_event_id" CHAR(512) NOT NULL UNIQUE,
+    "latitude" DOUBLE NOT NULL,
+    "longitude" DOUBLE NOT NULL,
+    "observation_date" DATE NOT NULL,
+    "start_time" TIME NOT NULL,
+    "observer_id" CHAR(512) NOT NULL,
+    "duration_minutes" INTEGER
+);
 success!
-success!
-success!
-success!
-success!
-success!
+timestamp: 2024-12-04T17:18:23.104908
+CREATE TABLE "sightings"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "sampling_event_identifier" CHAR(512) NOT NULL,
+    "common_name" CHAR(512) NOT NULL,
+    "observation_count" INTEGER
+);
 success!
 success!
 timestamp: 2024-12-04T13:58:22.457760
