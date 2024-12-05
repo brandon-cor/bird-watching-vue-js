@@ -28,3 +28,47 @@ CREATE TABLE "auth_user_tag_groups"(
     "record_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE  
 );
 success!
+timestamp: 2024-11-27T10:11:54.608026
+CREATE TABLE "species"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "name" CHAR(512) NOT NULL UNIQUE
+);
+success!
+timestamp: 2024-11-27T10:11:54.611011
+CREATE TABLE "checklists"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "sampling_event_id" CHAR(512) NOT NULL UNIQUE,
+    "latitude" DOUBLE NOT NULL,
+    "longitude" DOUBLE NOT NULL,
+    "observation_date" DATE NOT NULL,
+    "start_time" TIME NOT NULL,
+    "observer_id" CHAR(512) NOT NULL,
+    "duration_minutes" INTEGER
+);
+success!
+timestamp: 2024-11-27T10:11:54.613181
+CREATE TABLE "sightings"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "checklist_id" INTEGER REFERENCES "checklists" ("id") ON DELETE CASCADE ON UPDATE CASCADE  NOT NULL ,
+    "species_id" INTEGER REFERENCES "species" ("id") ON DELETE CASCADE ON UPDATE CASCADE  NOT NULL ,
+    "observation_count" INTEGER
+);
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+timestamp: 2024-11-27T18:48:14.724630
+ALTER TABLE "sightings" ADD "speciess_id" CHAR(512);
+success!
+success!
+timestamp: 2024-11-27T18:50:47.412016
+ALTER TABLE "sightings" ADD "species" CHAR(512);
+success!
+success!
+timestamp: 2024-11-27T18:52:06.664809
+ALTER TABLE "sightings" ADD "speciesss" CHAR(512);
+success!
