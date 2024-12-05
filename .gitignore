@@ -4,3 +4,5 @@ apps/*/databases/*
 apps/.service/*
 !databases/README.md
 .env
+py4web.sh
+.DS_Store
