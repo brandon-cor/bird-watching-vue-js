@@ -1,0 +1,31 @@
+<div id="stats">
+    <h1>User Statistics</h1>
+    
+    <!-- Search Box -->
+    <input type="text" v-model="searchQuery" @input="searchSpecies" placeholder="Search species..." />
+    <ul>
+      <li v-for="species in speciesSearchResults" :key="species.name" @click="fetchTrends(species.name)">
+        {{ species.name }}
+      </li>
+    </ul>
+  
+    <!-- Table of Stats -->
+    <table>
+      <thead>
+        <tr>
+          <th>Species</th>
+          <th>Total Observations</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="stat in speciesStats" :key="stat.common_name">
+          <td>{{ stat.common_name }}</td>
+          <td>{{ stat.total_count }}</td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- Trends Chart -->
+    <canvas id="trendsChart"></canvas>
+  </div>
+  

@@ -17,17 +17,12 @@ def get_user_email():
 def get_time():
     return datetime.datetime.utcnow()
 
-
-
-print("Starting database setup...")
-
 # Species table
 db.define_table(
     "species",
     Field("name", "string", unique=True, notnull=True, label="Common Name"),
     format="%(name)s",
 )
-print("Species table defined.")
 
 # Checklists table
 db.define_table(
@@ -40,7 +35,6 @@ db.define_table(
     Field("observer_id", "string", notnull=True, label="Observer ID"),
     Field("duration_minutes", "integer", requires=IS_INT_IN_RANGE(1, None), label="Duration (Minutes)"),
 )
-print("Checklists table defined.")
 
 # Sightings table
 db.define_table(
@@ -49,24 +43,9 @@ db.define_table(
     Field("common_name", "string", notnull=True, label="Common Name"),
     Field("observation_count", "integer", requires=IS_INT_IN_RANGE(1, None), label="Observation Count"),
 )
-print("Sightings table defined.")
 
-# print("Starting to define sightings_temp table...")
-# db.define_table(
-#     "sightings_temp",
-#     Field("dummy_field", "string", label="Dummy Field")
-# )
-# print("sightings_temp table defined successfully.")
-# db.commit()
-
-# db.define_table(
-#     "sightings",
-#     Field("dummy_field", "string", label="Dummy Field"),  # Add a placeholder field
-# )
-# print("Sightings table (simplified) defined.")
 
 db.commit()
-print("Database setup completed.")
 
 
 # #species: order of values
