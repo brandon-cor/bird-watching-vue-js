@@ -39,6 +39,10 @@ def index():
     return dict(
         # COMPLETE: return here any signed URLs you need.
         my_callback_url = URL('my_callback', signer=url_signer),
+        get_user_stats_url = URL('get_user_stats', signer=url_signer),
+        get_species_trends_url = URL('get_species_trends', signer=url_signer),
+        search_species_url = URL('search_species', signer=url_signer),
+        heatmap_data_url = URL('heatmap_data', signer=url_signer),
     )
 
 @action('my_callback')
@@ -86,3 +90,17 @@ def search_species():
     query = request.params.get("q", "")
     species = db(db.species.name.contains(query)).select().as_list()
     return dict(species=species)
+
+@action('heatmap_data', method=['GET'])
+@action.uses(db)
+def heatmap_data():
+    rows = db.executesql('''
+        SELECT
+            c.latitude,
+            c.longitude,
+            SUM(s.observation_count) AS density
+        FROM checklists c
+        JOIN sightings s ON c.sampling_event_id = s.sampling_event_identifier
+        GROUP BY c.latitude, c.longitude
+    ''', as_dict=True)
+    return dict(data=rows)

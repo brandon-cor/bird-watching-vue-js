@@ -30,81 +30,54 @@ app.data = {
             } else {
                 alert("Please select an area first!");
             }
-        },
-        addHeatmapData(points) {
-            // Update heatmap data with new points
-            this.heatmapData = points.map((point) => new google.maps.LatLng(point.lat, point.lng));
-            this.heatmap.setData(this.heatmapData);
-        },
+        // },
+        // addHeatmapData(points) {
+        //     // Update heatmap with weighted points
+        //     this.heatmapData = points;
+        //     this.heatmap.setData(this.heatmapData);
+        }
     },
     mounted() {
-        // Call the global initializeMap function when the component is mounted
-        initializeMap();
+        app.load_heatmap_data();
     },
 };
 
 // Mount the Vue application
 app.vue = Vue.createApp(app.data).mount("#app");
 
-// Define the global Google Maps initialization function
-function initializeMap() {
-    // Initialize Google Map
-    app.vue.map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 37.7749, lng: -122.4194 }, // Default location: San Francisco
-        zoom: 10,
-    });
-
-    // Initialize Heatmap Layer
-    app.vue.heatmap = new google.maps.visualization.HeatmapLayer({
-        data: app.vue.heatmapData,
-        map: app.vue.map,
-        radius: 20, // Adjust heatmap point radius
-    });
-
-    // Initialize Drawing Manager
-    app.vue.drawingManager = new google.maps.drawing.DrawingManager({
-        drawingMode: google.maps.drawing.OverlayType.RECTANGLE,
-        drawingControl: true,
-        drawingControlOptions: {
-            position: google.maps.ControlPosition.TOP_CENTER,
-            drawingModes: [google.maps.drawing.OverlayType.RECTANGLE],
-        },
-        rectangleOptions: {
-            fillColor: "#FF0000",
-            fillOpacity: 0.35,
-            strokeWeight: 2,
-            clickable: false,
-            editable: true,
-            zIndex: 1,
-        },
-    });
-
-    app.vue.drawingManager.setMap(app.vue.map);
-
-    // Handle rectangle creation
-    google.maps.event.addListener(
-        app.vue.drawingManager,
-        "overlaycomplete",
-        (event) => {
-            if (event.type === google.maps.drawing.OverlayType.RECTANGLE) {
-                if (app.vue.selectedArea) {
-                    app.vue.selectedArea.setMap(null); // Clear previous rectangle
-                }
-                app.vue.selectedArea = event.overlay;
-                const bounds = app.vue.selectedArea.getBounds();
-                console.log("Selected Area Bounds:", bounds.toString());
-            }
-        }
-    );
-}
-
 // Example external data load function for heatmap points
 app.load_heatmap_data = function () {
-    // Replace with a real API call to fetch heatmap data
-    axios.get(my_callback_url).then((response) => {
-        const points = response.data.points; // Assume the API returns an array of {lat, lng}
-        app.vue.addHeatmapData(points);
+    // axios.get(heatmap_data_url).then((response) => {
+    //     const points = response.data.map((record) => ({
+    //         location: new google.maps.LatLng(record.latitude, record.longitude),
+    //         weight: record.density, // Use 'density' to weight the heatmap points
+    //     }));
+    //     app.vue.addHeatmapData(points);
+    // }).catch((error) => {
+    //     console.error("Error loading heatmap data:", error);
+    // });
+    /* Data points defined as a mixture of WeightedLocation and LatLng objects */
+    var heatMapData = [
+        {location: new google.maps.LatLng(37.782, -122.447), weight: 0.5},
+        new google.maps.LatLng(37.782, -122.445),
+        {location: new google.maps.LatLng(37.782, -122.443), weight: 2},
+        {location: new google.maps.LatLng(37.782, -122.441), weight: 3},
+        {location: new google.maps.LatLng(37.782, -122.439), weight: 2},
+        new google.maps.LatLng(37.782, -122.437),
+        {location: new google.maps.LatLng(37.782, -122.435), weight: 0.5},
+    
+        {location: new google.maps.LatLng(37.785, -122.447), weight: 3},
+        {location: new google.maps.LatLng(37.785, -122.445), weight: 2},
+        new google.maps.LatLng(37.785, -122.443),
+        {location: new google.maps.LatLng(37.785, -122.441), weight: 0.5},
+        new google.maps.LatLng(37.785, -122.439),
+        {location: new google.maps.LatLng(37.785, -122.437), weight: 2},
+        {location: new google.maps.LatLng(37.785, -122.435), weight: 3}
+    ];
+    var heatmap = new google.maps.visualization.HeatmapLayer({
+        data: heatMapData
     });
+    heatmap.setMap(map);
 };
 
 // Load heatmap data
