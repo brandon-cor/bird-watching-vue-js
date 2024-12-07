@@ -1,54 +1,85 @@
 new Vue({
-    el: "#stats",
-    data: {
-      speciesStats: [], // List of all species seen
-      speciesTrends: [], // Trends data for a specific species
-      searchQuery: "", // Search box input
-      speciesSearchResults: [], // Search results
-      selectedSpecies: null, // Currently selected species
-      chart: null, // Chart.js instance
+  el: "#app", // Target the #app div in the HTML
+  data: {
+    userStats: [], // Holds stats from the backend
+    searchQuery: "", // Holds the search term
+    showTrends: false, // Toggles trend chart visibility
+    selectedSpecies: "", // Name of the selected species
+    trendData: [], // Holds trends for the selected species
+  },
+  computed: {
+    filteredStats() {
+      // Dynamically filter species based on search query
+      return this.userStats.filter(stat =>
+        stat.common_name.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
     },
-    methods: {
-      fetchStats() {
-        axios.get("/get_user_stats").then((response) => {
-          this.speciesStats = response.data.stats;
+  },
+  methods: {
+    async fetchUserStats() {
+      try {
+        const response = await axios.get("/birdwatching/get_user_stats");
+        this.userStats = response.data.stats; // Update the stats data
+      } catch (error) {
+        console.error("Error fetching user stats:", error);
+      }
+    },
+    async fetchTrends(speciesName) {
+      try {
+        const response = await axios.get("/birdwatching/get_species_trends", {
+          params: { species: speciesName },
         });
-      },
-      fetchTrends(species) {
-        this.selectedSpecies = species;
-        axios.get(`/get_species_trends?species=${species}`).then((response) => {
-          this.speciesTrends = response.data.trends;
-          this.plotTrends();
-        });
-      },
-      searchSpecies() {
-        axios.get(`/search_species?q=${this.searchQuery}`).then((response) => {
-          this.speciesSearchResults = response.data.species;
-        });
-      },
-      plotTrends() {
-        if (this.chart) this.chart.destroy();
-        const ctx = document.getElementById("trendsChart").getContext("2d");
-        const labels = this.speciesTrends.map((t) => t.observation_date);
-        const data = this.speciesTrends.map((t) => t.count);
-        this.chart = new Chart(ctx, {
+        this.trendData = response.data.trends; // Update trend data
+        this.selectedSpecies = speciesName; // Update selected species name
+        this.showTrends = true; // Show the trend chart
+        this.plotTrends(); // Plot the trend data
+      } catch (error) {
+        console.error("Error fetching trends:", error);
+      }
+    },
+    plotTrends() {
+      this.$nextTick(() => {
+
+        // Check if a chart already exists for this canvas and destroy it
+        const existingChart = Chart.getChart("trendChart");
+        if (existingChart) {
+          existingChart.destroy();
+        }
+        
+        const ctx = document.getElementById("trendChart").getContext("2d");
+
+        new Chart(ctx, {
           type: "line",
           data: {
-            labels: labels,
+            labels: this.trendData.map(t => t.observation_date), // X-axis: dates
             datasets: [
               {
-                label: `Observations of ${this.selectedSpecies}`,
-                data: data,
-                borderColor: "blue",
+                label: `Sightings of ${this.selectedSpecies}`,
+                data: this.trendData.map(t => t.count), // Y-axis: counts
                 fill: false,
+                borderColor: "blue",
+                tension: 0.1,
               },
             ],
           },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                display: true,
+              },
+            },
+            scales: {
+              x: { title: { display: true, text: "Date" } },
+              y: { title: { display: true, text: "Sightings Count" } },
+            },
+          },
         });
-      },
-    },
-    mounted() {
-      this.fetchStats();
-    },
-  });
-  
+      });
+    },    
+  },
+  mounted() {
+    // Fetch user stats when the page loads
+    this.fetchUserStats();
+  },
+});
