@@ -56,33 +56,46 @@ def stats():
 @action.uses(db, auth.user)
 def get_user_stats():
     user_email = auth.current_user.get("email")
-    stats = db.executesql('''
-        SELECT common_name, SUM(observation_count) AS total_count
-        FROM sightings
-        JOIN checklists ON sightings.sampling_event_identifier = checklists.sampling_event_id
-        WHERE checklists.observer_id = ?
-        GROUP BY common_name
-    ''', [user_email])
-    return dict(stats=stats)
+    print(f"Logged-in user: {user_email}")
+    try:
+        stats = db.executesql('''
+            SELECT common_name, SUM(observation_count) AS total_count
+            FROM sightings
+            JOIN checklists ON sightings.sampling_event_identifier = checklists.sampling_event_id
+            WHERE checklists.observer_id = ?
+            GROUP BY common_name
+        ''', [user_email])
+        print(f"Query results: {stats}")
+        return dict(stats=[{"common_name": row[0], "total_count": row[1]} for row in stats])
+    except Exception as e:
+        return dict(error=str(e))
 
 @action("get_species_trends", method=["GET"])
 @action.uses(db, auth.user)
 def get_species_trends():
-    species_name = request.params.get("species")
+    species_name = request.params.get("species", "").strip()
     user_email = auth.current_user.get("email")
-    trends = db.executesql('''
-        SELECT observation_date, SUM(observation_count) AS count
-        FROM sightings
-        JOIN checklists ON sightings.sampling_event_identifier = checklists.sampling_event_id
-        WHERE checklists.observer_id = ? AND sightings.common_name = ?
-        GROUP BY observation_date
-        ORDER BY observation_date ASC
-    ''', [user_email, species_name])
-    return dict(trends=trends)
+    if not species_name:
+        return dict(error="Species name is required.")
+    try:
+        trends = db.executesql('''
+            SELECT observation_date, SUM(observation_count) AS count
+            FROM sightings
+            JOIN checklists ON sightings.sampling_event_identifier = checklists.sampling_event_id
+            WHERE checklists.observer_id = ? AND sightings.common_name = ?
+            GROUP BY observation_date
+            ORDER BY observation_date ASC
+        ''', [user_email, species_name])
+        return dict(trends=[{"observation_date": row[0], "count": row[1]} for row in trends])
+    except Exception as e:
+        return dict(error=str(e))
 
 @action("search_species", method=["GET"])
 @action.uses(db)
 def search_species():
-    query = request.params.get("q", "")
-    species = db(db.species.name.contains(query)).select().as_list()
+    query = request.params.get("q", "").strip()
+    if not query:
+        return dict(species=[], message="Query is empty.")
+    species = db(db.species.name.contains(query)).select(limitby=(0, 20)).as_list()
     return dict(species=species)
+

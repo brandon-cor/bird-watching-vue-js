@@ -1,31 +1,35 @@
-<div id="stats">
-    <h1>User Statistics</h1>
-    
-    <!-- Search Box -->
-    <input type="text" v-model="searchQuery" @input="searchSpecies" placeholder="Search species..." />
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Stats</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div id="app">
+    <h1>User Stats</h1>
+
+    <!-- Searchable Species List -->
+    <input v-model="searchQuery" placeholder="Search species..." />
     <ul>
-      <li v-for="species in speciesSearchResults" :key="species.name" @click="fetchTrends(species.name)">
-        {{ species.name }}
+      <li v-for="stat in filteredStats" :key="stat.common_name">
+        {{ stat.common_name }}: {{ stat.total_count }}
+        <button @click="fetchTrends(stat.common_name)">View Trends</button>
       </li>
     </ul>
-  
-    <!-- Table of Stats -->
-    <table>
-      <thead>
-        <tr>
-          <th>Species</th>
-          <th>Total Observations</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="stat in speciesStats" :key="stat.common_name">
-          <td>{{ stat.common_name }}</td>
-          <td>{{ stat.total_count }}</td>
-        </tr>
-      </tbody>
-    </table>
-  
-    <!-- Trends Chart -->
-    <canvas id="trendsChart"></canvas>
+
+    <!-- Trends Over Time -->
+    <div v-if="showTrends">
+      <h2>Trends for {{ selectedSpecies }}</h2>
+      <canvas id="trendChart"></canvas>
+    </div>
+
+    <div v-else-if="!userStats.length">
+      <p>No data available. Start by submitting a <a href="/birdwatching/checklist">checklist</a>!</p>
+    </div>
   </div>
-  
+
+  <script src="/birdwatching/static/js/stats.js"></script>
+</body>
+</html>
