@@ -4,3 +4,4 @@ apps/*/databases/*
 apps/.service/*
 !databases/README.md
 .env
+.DS_Store

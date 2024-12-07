@@ -28,12 +28,12 @@ db.define_table(
 db.define_table(
     "checklists",
     Field("sampling_event_id", "string", unique=True, notnull=True, label="Sampling Event ID"),
-    Field("latitude", "double", notnull=True, label="Latitude"),
-    Field("longitude", "double", notnull=True, label="Longitude"),
-    Field("observation_date", "date", notnull=True, label="Observation Date"),
-    Field("start_time", "time", notnull=True, label="Time Observations Started"),
-    Field("observer_id", "string", notnull=True, label="Observer ID"),
-    Field("duration_minutes", "integer", requires=IS_INT_IN_RANGE(1, None), label="Duration (Minutes)"),
+    Field("latitude", "double", label="Latitude"),
+    Field("longitude", "double", label="Longitude"),
+    Field("observation_date", "date", label="Observation Date"),
+    Field("start_time", label="Time Observations Started"),
+    Field("observer_id", "string", label="Observer ID"),
+    Field("duration_minutes", "double", label="Duration (Minutes)"),
 )
 
 # Sightings table
