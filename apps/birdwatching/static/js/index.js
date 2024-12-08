@@ -30,55 +30,31 @@ app.data = {
             } else {
                 alert("Please select an area first!");
             }
-        // },
-        // addHeatmapData(points) {
-        //     // Update heatmap with weighted points
-        //     this.heatmapData = points;
-        //     this.heatmap.setData(this.heatmapData);
-        }
+        },
+        addHeatmapData(points) {
+            // Update heatmap with weighted points
+            this.heatmapData = points;
+            if (this.heatmap) {
+                this.heatmap.setData(this.heatmapData);
+            }
+        },
+        load_heatmap_data() {
+            axios.get(heatmap_data_url).then((response) => {
+                const points = response.data.map((record) => ({
+                    location: new google.maps.LatLng(record.latitude, record.longitude),
+                    weight: record.density, // Use 'density' to weight the heatmap points
+                }));
+                console.log("Heatmap data loaded:", points);
+                this.addHeatmapData(points);
+            }).catch((error) => {
+                console.error("Error loading heatmap data:", error);
+            });
+        },
     },
     mounted() {
-        app.load_heatmap_data();
+        this.load_heatmap_data(); // Use `this` to call the method within Vue's context
     },
 };
 
 // Mount the Vue application
 app.vue = Vue.createApp(app.data).mount("#app");
-
-// Example external data load function for heatmap points
-app.load_heatmap_data = function () {
-    // axios.get(heatmap_data_url).then((response) => {
-    //     const points = response.data.map((record) => ({
-    //         location: new google.maps.LatLng(record.latitude, record.longitude),
-    //         weight: record.density, // Use 'density' to weight the heatmap points
-    //     }));
-    //     app.vue.addHeatmapData(points);
-    // }).catch((error) => {
-    //     console.error("Error loading heatmap data:", error);
-    // });
-    /* Data points defined as a mixture of WeightedLocation and LatLng objects */
-    var heatMapData = [
-        {location: new google.maps.LatLng(37.782, -122.447), weight: 0.5},
-        new google.maps.LatLng(37.782, -122.445),
-        {location: new google.maps.LatLng(37.782, -122.443), weight: 2},
-        {location: new google.maps.LatLng(37.782, -122.441), weight: 3},
-        {location: new google.maps.LatLng(37.782, -122.439), weight: 2},
-        new google.maps.LatLng(37.782, -122.437),
-        {location: new google.maps.LatLng(37.782, -122.435), weight: 0.5},
-    
-        {location: new google.maps.LatLng(37.785, -122.447), weight: 3},
-        {location: new google.maps.LatLng(37.785, -122.445), weight: 2},
-        new google.maps.LatLng(37.785, -122.443),
-        {location: new google.maps.LatLng(37.785, -122.441), weight: 0.5},
-        new google.maps.LatLng(37.785, -122.439),
-        {location: new google.maps.LatLng(37.785, -122.437), weight: 2},
-        {location: new google.maps.LatLng(37.785, -122.435), weight: 3}
-    ];
-    var heatmap = new google.maps.visualization.HeatmapLayer({
-        data: heatMapData
-    });
-    heatmap.setMap(map);
-};
-
-// Load heatmap data
-app.load_heatmap_data();

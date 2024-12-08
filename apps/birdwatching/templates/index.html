@@ -43,20 +43,45 @@
 <script>
     // Initialize the map
     function initMap() {
-        navigator.geolocation.getCurrentPosition(function(position) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            // Initialize the map
             const map = new google.maps.Map(document.getElementById("map"), {
                 center: { lat: position.coords.latitude, lng: position.coords.longitude },
-                zoom: 10,
+                zoom: 8,
             });
-            let rectangle;
+
+            // Heatmap data
+            const heatMapData = [
+                { location: new google.maps.LatLng(37.782, -122.447), weight: 0.5 },
+                { location: new google.maps.LatLng(37.782, -122.443), weight: 2 },
+                { location: new google.maps.LatLng(37.782, -122.441), weight: 3 },
+                { location: new google.maps.LatLng(37.782, -122.439), weight: 2 },
+                new google.maps.LatLng(37.782, -122.437),
+                { location: new google.maps.LatLng(37.782, -122.435), weight: 0.5 },
+
+                { location: new google.maps.LatLng(37.785, -122.447), weight: 3 },
+                { location: new google.maps.LatLng(37.785, -122.445), weight: 2 },
+                new google.maps.LatLng(37.785, -122.443),
+                { location: new google.maps.LatLng(37.785, -122.441), weight: 0.5 },
+                new google.maps.LatLng(37.785, -122.439),
+                { location: new google.maps.LatLng(37.785, -122.437), weight: 2 },
+                { location: new google.maps.LatLng(37.785, -122.435), weight: 3 },
+            ];
+
+            // Add heatmap layer
+            const heatmap = new google.maps.visualization.HeatmapLayer({
+                data: heatMapData,
+            });
+            heatmap.setMap(map);
+
+            // Drawing Manager
+            let rectangle; // Store the current rectangle
             const drawingManager = new google.maps.drawing.DrawingManager({
                 drawingMode: google.maps.drawing.OverlayType.MARKER,
                 drawingControl: true,
                 drawingControlOptions: {
                     position: google.maps.ControlPosition.TOP_CENTER,
-                    drawingModes: [
-                        google.maps.drawing.OverlayType.RECTANGLE,
-                    ],
+                    drawingModes: [google.maps.drawing.OverlayType.RECTANGLE],
                 },
                 rectangleOptions: {
                     fillColor: "#ffff00",
@@ -68,17 +93,18 @@
                 },
             });
 
-            google.maps.event.addListener(drawingManager, 'overlaycomplete', function(event) {
+            // Event listener for overlay complete
+            google.maps.event.addListener(drawingManager, "overlaycomplete", function (event) {
                 if (rectangle) {
-                    rectangle.setMap(null);
+                    rectangle.setMap(null); // Remove the existing rectangle
                 }
-                rectangle = event.overlay;
+                rectangle = event.overlay; // Set the new rectangle
             });
 
+            // Add drawing manager to map
             drawingManager.setMap(map);
         });
     }
-
     window.initMap = initMap;
 </script>
 </script>
