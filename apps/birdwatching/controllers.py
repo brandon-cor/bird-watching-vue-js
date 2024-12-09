@@ -103,6 +103,22 @@ def search_species():
     species = db(db.species.name.contains(query)).select(limitby=(0, 20)).as_list()
     return dict(species=species)
 
+@action("get_overall_trends", method=["GET"])
+@action.uses(db, auth.user)
+def get_overall_trends():
+    user_email = auth.current_user.get("email")
+    rows = db.executesql('''
+        SELECT strftime('%Y-%m', observation_date) AS month, SUM(observation_count) AS total_count
+        FROM checklists
+        JOIN sightings ON checklists.sampling_event_id = sightings.sampling_event_identifier
+        WHERE checklists.observer_id = ?
+        GROUP BY month
+        ORDER BY month ASC
+    ''', [user_email])
+    return dict(trends=[
+        {"month": row[0], "total_count": row[1]} for row in rows
+    ])
+
 
 @action('heatmap_data', method=['GET'])
 @action.uses(db)
