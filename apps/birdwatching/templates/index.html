@@ -12,7 +12,7 @@
 </style>
 
 <div class="section" id="app" v-cloak>
-    <h1 class="title"><i class="fa-solid fa-binoculars"></i> Bird Watching App</h1>
+    <h1 class="title"></i> Bird Watching App</h1>
     <p>Welcome to the Bird Watching App!</p>
     
     <!-- Map Container -->
@@ -43,40 +43,37 @@
 <script>
     // Initialize the map
     function initMap() {
-        navigator.geolocation.getCurrentPosition(function (position) {
-            // Initialize the map
-            const map = new google.maps.Map(document.getElementById("map"), {
+        navigator.geolocation.getCurrentPosition((position) => {
+            // Initialize Vue's `map` instance
+            app.vue.map = new google.maps.Map(document.getElementById("map"), {
                 center: { lat: position.coords.latitude, lng: position.coords.longitude },
                 zoom: 8,
             });
 
-            // Heatmap data
-            const heatMapData = [
-                { location: new google.maps.LatLng(37.782, -122.447), weight: 0.5 },
-                { location: new google.maps.LatLng(37.782, -122.443), weight: 2 },
-                { location: new google.maps.LatLng(37.782, -122.441), weight: 3 },
-                { location: new google.maps.LatLng(37.782, -122.439), weight: 2 },
-                new google.maps.LatLng(37.782, -122.437),
-                { location: new google.maps.LatLng(37.782, -122.435), weight: 0.5 },
-
-                { location: new google.maps.LatLng(37.785, -122.447), weight: 3 },
-                { location: new google.maps.LatLng(37.785, -122.445), weight: 2 },
-                new google.maps.LatLng(37.785, -122.443),
-                { location: new google.maps.LatLng(37.785, -122.441), weight: 0.5 },
-                new google.maps.LatLng(37.785, -122.439),
-                { location: new google.maps.LatLng(37.785, -122.437), weight: 2 },
-                { location: new google.maps.LatLng(37.785, -122.435), weight: 3 },
-            ];
-
-            // Add heatmap layer
-            const heatmap = new google.maps.visualization.HeatmapLayer({
-                data: heatMapData,
+            // Initialize Vue's heatmap layer
+            app.vue.heatmap = new google.maps.visualization.HeatmapLayer({
+                data: [], // Initially empty
+                map: app.vue.map,
+                radius: 20,
+                opacity: 0.6
             });
-            heatmap.setMap(map);
+                // Fetch heatmap data from the endpoint
+                fetch(heatmap_data_url)
+                    .then(response => response.json())
+                    .then(data => {
+                        const heatmapData = data.data.map(item => {
+                            return {
+                                location: new google.maps.LatLng(item.latitude, item.longitude),
+                                weight: item.density
+                            };
+                        });
+                        app.vue.heatmap.setData(heatmapData);
+                    })
+                        .catch(error => console.error('Error fetching heatmap data:', error));
+            });
 
             // Drawing Manager
-            let rectangle; // Store the current rectangle
-            const drawingManager = new google.maps.drawing.DrawingManager({
+            app.vue.drawingManager = new google.maps.drawing.DrawingManager({
                 drawingMode: google.maps.drawing.OverlayType.MARKER,
                 drawingControl: true,
                 drawingControlOptions: {
@@ -94,23 +91,24 @@
             });
 
             // Event listener for overlay complete
-            google.maps.event.addListener(drawingManager, "overlaycomplete", function (event) {
-                if (rectangle) {
-                    rectangle.setMap(null); // Remove the existing rectangle
+            google.maps.event.addListener(app.vue.drawingManager, "overlaycomplete", function (event) {
+                if (app.vue.selectedArea) {
+                    app.vue.selectedArea.setMap(null); // Remove the existing rectangle
                 }
-                rectangle = event.overlay; // Set the new rectangle
+                app.vue.selectedArea = event.overlay; // Set the new rectangle
             });
 
             // Add drawing manager to map
-            drawingManager.setMap(map);
-        });
-    }
+            app.vue.drawingManager.setMap(app.vue.map);
+
+            // Load heatmap data dynamically
+            app.vue.load_heatmap_data();
+        };
     window.initMap = initMap;
 </script>
-</script>
+
 <!-- Load Google Maps API -->
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAA8lMIJa2_PXy94ZywUWiQjyh6kVT5Hlo&loading=async&libraries=visualization,drawing&callback=initMap"></script>
-</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="js/index.js"></script>
+<script src="/birdwatching/static/js/index.js"></script>
 [[end]]
