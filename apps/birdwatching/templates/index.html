@@ -6,23 +6,49 @@
 } */
 
 #map {
-    height: 500px;
-    width: 100%;
+    height: 500px; /* Set your desired map height */
+    margin-bottom: 20px; /* Space below the map */
 }
+
+#search-box {
+    display: block; /* Ensure the search box is block-level */
+    /*margin: 10px auto; /* Add space around the search box */
+    padding: 8px; /* Add padding inside the search box */
+    width: 80%; /* Set width relative to the container */
+    max-width: 500px; /* Limit the maximum width */
+}
+
+#buttons-container {
+    display: flex; /* Align buttons horizontally */
+    gap: 10px; /* Add space between buttons */
+    justify-content: center; /* Center buttons */
+    margin-top: 20px; /* Add space above the buttons */
+}
+
+button {
+    padding: 10px 15px; /* Add padding inside buttons */
+    font-size: 14px; /* Set button font size */
+}
+
 </style>
 
 <div class="section" id="app" v-cloak>
     <h1 class="title"></i> Bird Watching App</h1>
-    <p>Welcome to the Bird Watching App!</p>
+    <p>A density of birds in your area:</p>
     
     <!-- Map Container -->
     <div id="map"></div>
-    
-    <!-- Species Selection -->
-    <div>
-        <label for="species-select">Select Species:</label>
-        <input id="species-select" v-model="selectedSpecies" placeholder="Type species name..." />
+
+    <!-- Search Box -->
+    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+        <label for="search-box" style="margin-right: 10px;">Filter density by species:</label>
+        <input
+            type="text"
+            id="search-box"
+            placeholder="Type species name"
+        />
     </div>
+
     
     <!-- Action Buttons -->
     <div class="buttons">
