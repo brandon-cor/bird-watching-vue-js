@@ -26,7 +26,7 @@
     
     <!-- Action Buttons -->
     <div class="buttons">
-        <a href="birdwatching/checklist" class="button is-primary">Submit Checklist</a>
+        <a href="/birdwatching/checklist" class="button is-primary">Submit Checklist</a>
         <a href="/birdwatching/stats" class="button is-link">My Birding Stats</a>
         <button @click="fetchStatistics" class="button is-success">Statistics on Region</button>
     </div>
@@ -50,31 +50,38 @@
                 zoom: 8,
             });
 
-            // Initialize Vue's heatmap layer
+            // Initialize heatmap layer
             app.vue.heatmap = new google.maps.visualization.HeatmapLayer({
                 data: [], // Initially empty
                 map: app.vue.map,
                 radius: 20,
-                opacity: 0.6
-            });
-                // Fetch heatmap data from the endpoint
-                fetch(heatmap_data_url)
-                    .then(response => response.json())
-                    .then(data => {
-                        const heatmapData = data.data.map(item => {
-                            return {
-                                location: new google.maps.LatLng(item.latitude, item.longitude),
-                                weight: item.density
-                            };
-                        });
-                        app.vue.heatmap.setData(heatmapData);
-                    })
-                        .catch(error => console.error('Error fetching heatmap data:', error));
+                opacity: 0.6,
             });
 
-            // Drawing Manager
+            // Fetch heatmap data from the endpoint
+            fetch(heatmap_data_url)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    const heatmapData = data.data.map((item) => {
+                        return {
+                            location: new google.maps.LatLng(item.latitude, item.longitude),
+                            weight: item.density,
+                        };
+                    });
+                    app.vue.heatmap.setData(heatmapData);
+                })
+                .catch((error) =>
+                    console.error("Error fetching heatmap data:", error)
+                );
+
+            // Initialize drawing manager
             app.vue.drawingManager = new google.maps.drawing.DrawingManager({
-                drawingMode: google.maps.drawing.OverlayType.MARKER,
+                drawingMode: google.maps.drawing.OverlayType.RECTANGLE,
                 drawingControl: true,
                 drawingControlOptions: {
                     position: google.maps.ControlPosition.TOP_CENTER,
@@ -90,20 +97,23 @@
                 },
             });
 
-            // Event listener for overlay complete
-            google.maps.event.addListener(app.vue.drawingManager, "overlaycomplete", function (event) {
-                if (app.vue.selectedArea) {
-                    app.vue.selectedArea.setMap(null); // Remove the existing rectangle
-                }
-                app.vue.selectedArea = event.overlay; // Set the new rectangle
-            });
-
-            // Add drawing manager to map
+            // Add drawing manager to the map
             app.vue.drawingManager.setMap(app.vue.map);
 
-            // Load heatmap data dynamically
-            app.vue.load_heatmap_data();
-        };
+            // Event listener for overlay complete
+            google.maps.event.addListener(
+                app.vue.drawingManager,
+                "overlaycomplete",
+                function (event) {
+                    if (app.vue.selectedArea) {
+                        app.vue.selectedArea.setMap(null); // Remove the existing rectangle
+                    }
+                    app.vue.selectedArea = event.overlay; // Store the new rectangle
+                }
+        );
+    });
+}
+
     window.initMap = initMap;
 </script>
 
