@@ -6,27 +6,56 @@
 } */
 
 #map {
-    height: 500px;
-    width: 100%;
+    height: 500px; /* Set your desired map height */
+    margin-bottom: 20px; /* Space below the map */
 }
+
+#search-box {
+    display: block; /* Ensure the search box is block-level */
+    /*margin: 10px auto; /* Add space around the search box */
+    padding: 8px; /* Add padding inside the search box */
+    width: 80%; /* Set width relative to the container */
+    max-width: 500px; /* Limit the maximum width */
+}
+
+#buttons-container {
+    display: flex; /* Align buttons horizontally */
+    gap: 10px; /* Add space between buttons */
+    justify-content: center; /* Center buttons */
+    margin-top: 20px; /* Add space above the buttons */
+}
+
+button {
+    padding: 10px 15px; /* Add padding inside buttons */
+    font-size: 14px; /* Set button font size */
+}
+
 </style>
 
 <div class="section" id="app" v-cloak>
-    <h1 class="title"><i class="fa-solid fa-binoculars"></i> Bird Watching App</h1>
-    <p>Welcome to the Bird Watching App!</p>
+    <h1 class="title"></i> Bird Watching App</h1>
+    <p>A density of birds in your area:</p>
     
     <!-- Map Container -->
     <div id="map"></div>
-    
-    <!-- Species Selection -->
-    <div>
-        <label for="species-select">Select Species:</label>
-        <input id="species-select" v-model="selectedSpecies" placeholder="Type species name..." />
-    </div>
+
+    <!-- Search Box -->
+    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+        <label for="search-box" style="margin-right: 10px;">Filter density by species:</label>
+        <input
+            type="text"
+            id="search-box"
+            placeholder="Type species name"
+            v-model="searchQuery"
+        />
+        <!-- Search Button -->
+        <button @click="load_heatmap_data" class="button is-info">Search</button>
+    </div>  
+
     
     <!-- Action Buttons -->
     <div class="buttons">
-        <a href="birdwatching/checklist" class="button is-primary">Submit Checklist</a>
+        <a href="/birdwatching/checklist" class="button is-primary">Submit Checklist</a>
         <a href="/birdwatching/stats" class="button is-link">My Birding Stats</a>
         <button @click="fetchStatistics" class="button is-success">Statistics on Region</button>
     </div>
@@ -35,22 +64,70 @@
 [[block page_scripts]]
 <script>
     let my_callback_url = "[[=XML(my_callback_url)]]";
+    let get_user_stats_url = "[[=XML(get_user_stats_url)]]";
+    let get_species_trends_url = "[[=XML(get_species_trends_url)]]";
+    let search_species_url = "[[=XML(search_species_url)]]";
+    let heatmap_data_url = "[[=XML(heatmap_data_url)]]";
 </script>
-<script>
+<script>   
     // Initialize the map
     function initMap() {
-        // Create a map centered on the user's location
-      navigator.geolocation.getCurrentPosition(function(position) {
-          let map = new google.maps.Map(document.getElementById('map'), {
-              center: { lat: 37.7749, lng: -122.4194 },
-              zoom: 10
-          });
-          });
-    }
+        navigator.geolocation.getCurrentPosition((position) => {
+            // Initialize Vue's `map` instance
+            app.vue.map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: position.coords.latitude, lng: position.coords.longitude },
+                zoom: 8,
+            });
+            // Initialize heatmap layer
+            app.vue.heatmap = new google.maps.visualization.HeatmapLayer({
+                data: [], // Initially empty
+                map: app.vue.map,
+                radius: 20,
+                opacity: 0.6,
+            });
+
+            app.vue.load_heatmap_data();
+
+            // Initialize drawing manager
+            app.vue.drawingManager = new google.maps.drawing.DrawingManager({
+                drawingMode: google.maps.drawing.OverlayType.RECTANGLE,
+                drawingControl: true,
+                drawingControlOptions: {
+                    position: google.maps.ControlPosition.TOP_CENTER,
+                    drawingModes: [google.maps.drawing.OverlayType.RECTANGLE],
+                },
+                rectangleOptions: {
+                    fillColor: "#ffff00",
+                    fillOpacity: 0.2, // Set transparency
+                    strokeWeight: 5,
+                    clickable: false,
+                    editable: true,
+                    zIndex: 1,
+                },
+            });
+
+            // Add drawing manager to the map
+            app.vue.drawingManager.setMap(app.vue.map);
+
+            // Event listener for overlay complete
+            google.maps.event.addListener(
+                app.vue.drawingManager,
+                "overlaycomplete",
+                function (event) {
+                    if (app.vue.selectedArea) {
+                        app.vue.selectedArea.setMap(null); // Remove the existing rectangle
+                    }
+                    app.vue.selectedArea = event.overlay; // Store the new rectangle
+                }
+        );
+    });
+}
+
+    window.initMap = initMap;
 </script>
+
 <!-- Load Google Maps API -->
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAA8lMIJa2_PXy94ZywUWiQjyh6kVT5Hlo&loading=async&libraries=visualization,drawing&callback=initMap"></script>
-</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="js/index.js"></script>
 [[end]]

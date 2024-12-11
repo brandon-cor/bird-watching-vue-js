@@ -1,31 +1,53 @@
-<div id="stats">
-    <h1>User Statistics</h1>
-    
-    <!-- Search Box -->
-    <input type="text" v-model="searchQuery" @input="searchSpecies" placeholder="Search species..." />
-    <ul>
-      <li v-for="species in speciesSearchResults" :key="species.name" @click="fetchTrends(species.name)">
-        {{ species.name }}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Stats</title>
+  <link rel="stylesheet" href="/birdwatching/static/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div id="app" class="container">
+    <header class="header">
+      <h1>My Birding Stats</h1>
+    </header>
+
+    <!-- Button to view overall trends -->
+    <div class="button-group">
+      <button @click="fetchSummaryTrends" class="primary-button">View Overall Trends</button>
+    </div>
+
+    <!-- Overall trends visualization -->
+    <div v-if="showSummary" class="chart-container">
+      <h2>Overall Bird-Watching Trends</h2>
+      <canvas id="summaryChart"></canvas>
+    </div>
+
+    <!-- Searchable Species List -->
+    <div class="search-container">
+      <input v-model="searchQuery" placeholder="Search species..." class="search-input" />
+    </div>
+    <ul class="species-list">
+      <li v-for="stat in filteredStats" :key="stat.common_name" class="species-item">
+        <span class="species-name">{{ stat.common_name }}</span>
+        <span class="species-count">({{ stat.total_count }})</span>
+        <button @click="fetchTrends(stat.common_name)" class="secondary-button">View Trends</button>
       </li>
     </ul>
-  
-    <!-- Table of Stats -->
-    <table>
-      <thead>
-        <tr>
-          <th>Species</th>
-          <th>Total Observations</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="stat in speciesStats" :key="stat.common_name">
-          <td>{{ stat.common_name }}</td>
-          <td>{{ stat.total_count }}</td>
-        </tr>
-      </tbody>
-    </table>
-  
-    <!-- Trends Chart -->
-    <canvas id="trendsChart"></canvas>
+
+    <!-- Trends Over Time -->
+    <div v-if="showTrends" class="chart-container">
+      <h2>Trends for {{ selectedSpecies }}</h2>
+      <canvas id="trendChart"></canvas>
+    </div>
+
+    <!-- No Data Message -->
+    <div v-else-if="!userStats.length" class="no-data">
+      <p>No data available. Start by submitting a <a href="/birdwatching/checklist" class="link">checklist</a>!</p>
+    </div>
   </div>
-  
+
+  <script src="/birdwatching/static/js/stats.js"></script>
+</body>
+</html>

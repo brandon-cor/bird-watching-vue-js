@@ -1,0 +1,131 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+  }
+  
+  .container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+  }
+  
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  h1 {
+    color: #333;
+  }
+  
+  h2 {
+    color: #555;
+  }
+  
+  /* Button Styles */
+  .button-group {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .primary-button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .primary-button:hover {
+    background-color: #45a049;
+  }
+  
+  .secondary-button {
+    background-color: #008cba;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .secondary-button:hover {
+    background-color: #007bb5;
+  }
+  
+  /* Search Input */
+  .search-container {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .search-input {
+    padding: 10px;
+    width: 80%;
+    max-width: 400px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  
+  /* Species List */
+  .species-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 600px;
+  }
+  
+  .species-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+  }
+  
+  .species-name {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .species-count {
+    color: #777;
+  }
+  
+  /* Charts */
+  .chart-container {
+    margin: 30px 0;
+    text-align: center;
+  }
+  
+  canvas {
+    max-width: 100%;
+  }
+  
+  /* No Data Message */
+  .no-data {
+    text-align: center;
+    color: #999;
+  }
+  
+  .link {
+    color: #007bb5;
+    text-decoration: none;
+  }
+  
+  .link:hover {
+    text-decoration: underline;
+  }
+  
