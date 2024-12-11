@@ -46,8 +46,11 @@ button {
             type="text"
             id="search-box"
             placeholder="Type species name"
+            v-model="searchQuery"
         />
-    </div>
+        <!-- Search Button -->
+        <button @click="load_heatmap_data" class="button is-info">Search</button>
+    </div>  
 
     
     <!-- Action Buttons -->
@@ -66,7 +69,7 @@ button {
     let search_species_url = "[[=XML(search_species_url)]]";
     let heatmap_data_url = "[[=XML(heatmap_data_url)]]";
 </script>
-<script>
+<script>   
     // Initialize the map
     function initMap() {
         navigator.geolocation.getCurrentPosition((position) => {
@@ -75,7 +78,6 @@ button {
                 center: { lat: position.coords.latitude, lng: position.coords.longitude },
                 zoom: 8,
             });
-
             // Initialize heatmap layer
             app.vue.heatmap = new google.maps.visualization.HeatmapLayer({
                 data: [], // Initially empty
@@ -84,26 +86,7 @@ button {
                 opacity: 0.6,
             });
 
-            // Fetch heatmap data from the endpoint
-            fetch(heatmap_data_url)
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    const heatmapData = data.data.map((item) => {
-                        return {
-                            location: new google.maps.LatLng(item.latitude, item.longitude),
-                            weight: item.density,
-                        };
-                    });
-                    app.vue.heatmap.setData(heatmapData);
-                })
-                .catch((error) =>
-                    console.error("Error fetching heatmap data:", error)
-                );
+            app.vue.load_heatmap_data();
 
             // Initialize drawing manager
             app.vue.drawingManager = new google.maps.drawing.DrawingManager({
@@ -146,5 +129,5 @@ button {
 <!-- Load Google Maps API -->
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAA8lMIJa2_PXy94ZywUWiQjyh6kVT5Hlo&loading=async&libraries=visualization,drawing&callback=initMap"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="/birdwatching/static/js/index.js"></script>
+<script src="js/index.js"></script>
 [[end]]

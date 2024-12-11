@@ -30,11 +30,12 @@ from yatl.helpers import A
 from .common import db, session, T, cache, auth, logger, authenticated, unauthenticated, flash
 from py4web.utils.url_signer import URLSigner
 from .models import get_user_email
+import urllib.parse
 
 url_signer = URLSigner(session)
 
 @action('index')
-@action.uses('index.html', db, auth, url_signer)
+@action.uses('index.html', db, auth.user, url_signer)
 def index():
     return dict(
         # COMPLETE: return here any signed URLs you need.
@@ -123,6 +124,28 @@ def get_overall_trends():
 @action('heatmap_data', method=['GET'])
 @action.uses(db)
 def heatmap_data():
+    # Get the full query string
+    query_string = request.query_string
+    
+    # Check if the query string contains a second '?' and split it
+    if "?" in query_string:
+        query_string = query_string.split("?", 1)[1]
+    
+    # Parse the query string manually
+    query_params = urllib.parse.parse_qs(query_string)
+    species_name = query_params.get("species_name", [""])[0].strip()
+
+    if not species_name:
+        rows = db.executesql('''
+            SELECT
+                c.latitude,
+                c.longitude,
+                SUM(s.observation_count) AS density
+            FROM checklists c
+            JOIN sightings s ON c.sampling_event_id = s.sampling_event_identifier
+            GROUP BY c.latitude, c.longitude
+        ''', as_dict=True)
+        return dict(data=rows)
     rows = db.executesql('''
         SELECT
             c.latitude,
@@ -130,6 +153,8 @@ def heatmap_data():
             SUM(s.observation_count) AS density
         FROM checklists c
         JOIN sightings s ON c.sampling_event_id = s.sampling_event_identifier
+        WHERE s.common_name = ?
         GROUP BY c.latitude, c.longitude
-    ''', as_dict=True)
+    ''', [species_name], as_dict=True)
     return dict(data=rows)
+

@@ -1,3 +1,10 @@
+"use strict";
+
+// This will be the object that contains the Vue attributes
+// and will be used to initialize the application.
+const app = {
+    vue: {}
+};
 app.data = {
     data() {
         return {
@@ -6,31 +13,33 @@ app.data = {
             drawingManager: null,
             selectedArea: null,
             heatmapData: [],
-            selectedSpecies: "",
+            searchQuery: "",
         };
     },
     methods: {
         load_heatmap_data() {
-            axios
-                .get(heatmap_data_url)
-                .then((response) => {
-                    const data = response.data.data || [];
-                    if (Array.isArray(data)) {
-                        const points = data.map((record) => ({
-                            location: new google.maps.LatLng(record.latitude, record.longitude),
-                            weight: record.density,
-                        }));
-                        this.heatmapData = points; 
-                        if (this.heatmap) {
-                            this.heatmap.setData(this.heatmapData);
-                        }
-                    } else {
-                        console.error("Unexpected data format:", data);
+            fetch(`${heatmap_data_url}?species_name=${encodeURIComponent(this.searchQuery)}`)
+            .then((response) => {
+                    console.log(response);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
+                    return response.json();
                 })
-                .catch((error) => {
-                    console.error("Error fetching heatmap data:", error);
-                });
+                .then((data) => {
+                    const heatmapData = data.data.map((item) => {
+                        return {
+                            location: new google.maps.LatLng(item.latitude, item.longitude),
+                            weight: item.density,
+                        };
+                    });
+                    app.vue.heatmap.setData(heatmapData);
+                })
+                .catch((error) =>
+                    console.error("Error fetching heatmap data:", error)
+                );
         },
     },
 };
+
+app.vue = Vue.createApp(app.data).mount("#app");
