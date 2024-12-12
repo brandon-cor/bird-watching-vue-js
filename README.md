@@ -1,3 +1,7 @@
+# Project Contributions
+
+Mohan - Stats page and helped develop database schema
+
 # Project: Bird Watching App
 
 The goal of the project is to build a bird-watching app/site, loosely modeled on ebird.org.  The project has been chosen in a way that will let us play with many interesting features in web development, including developing responsive one-page apps, maps integration, user communication, and more. 
