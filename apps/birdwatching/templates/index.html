@@ -55,7 +55,8 @@ button {
     
     <!-- Action Buttons -->
     <div class="buttons">
-        <a href="/birdwatching/checklist" class="button is-primary">Submit Checklist</a>
+        <button class="button is-primary" @click="checklist">Select Position</button>
+        <button class="button is-success" @click="checklist">Add Checklist</button>
         <a href="/birdwatching/stats" class="button is-link">My Birding Stats</a>
         <button @click="fetchStatistics" class="button is-success">Statistics on Region</button>
     </div>
@@ -121,17 +122,6 @@ button {
                 }
             );
 
-            // Event listener for selecting map position
-            google.maps.event.addListener(
-                app.vue.maps,
-                "click",
-                function (event) {
-                    // app.vue.latitude = event.latLng.lat();
-                    // app.vue.longitude = event.latLng.lng();
-                    app.vue.latitude = 1;
-                    app.vue.longitude = 2;
-                }
-            );
         });
 
         

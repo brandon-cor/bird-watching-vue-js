@@ -33,6 +33,7 @@ from .models import get_user_email
 import urllib.parse
 
 url_signer = URLSigner(session)
+abcd = 8
 
 @action('index')
 @action.uses('index.html', db, auth.user, url_signer)
@@ -50,7 +51,7 @@ def index():
 @action.uses() # Add here things like db, auth, etc.
 def my_callback():
     # The return value should be a dictionary that will be sent as JSON.
-    return dict(my_value=3)
+    return dict(my_value=abcd)
 
 @action("stats", method=["GET"])
 @action.uses("stats.html", auth.user)
@@ -158,3 +159,11 @@ def heatmap_data():
     ''', [species_name], as_dict=True)
     return dict(data=rows)
 
+@action("checklist", method=["GET"])
+@action.uses("checklist.html", db, auth.user)
+def checklist():
+    return dict(
+        # COMPLETE: return here any signed URLs you need.
+        my_callback_url = URL('my_callback'),
+        
+    )

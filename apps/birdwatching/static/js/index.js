@@ -16,6 +16,8 @@ app.data = {
             searchQuery: "",
             latitude: null,
             longitude: null,
+            cheklist_text: "Add Checklist",
+            noMarker: true
         };
     },
     methods: {
@@ -41,6 +43,31 @@ app.data = {
                     console.error("Error fetching heatmap data:", error)
                 );
         },
+        checklist() {
+            if (this.noMarker) {
+                this.add_marker();
+            } else {
+                
+            }
+        },
+        add_marker() {
+            let loc = {};
+            let c = app.vue.map.getCenter();
+            this.latitude = c.lat();
+            this.longitude = c.lng();
+            let marker_options = {
+                position: {lat: c.lat(), lng: c.lng()},
+                map: app.vue.map,
+                draggable: true,
+            }
+            loc.marker = new google.maps.Marker(marker_options);
+            loc.marker.addListener('dragend', function () {
+                let l = loc.marker.getPosition();
+                this.latitude = l.lat();
+                this.longitude = l.lng();
+            });
+            this.noMarker = false
+        }
     },
 };
 
