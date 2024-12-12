@@ -14,6 +14,8 @@ app.data = {
             selectedArea: null,
             heatmapData: [],
             searchQuery: "",
+            latitude: null,
+            longitude: null,
         };
     },
     methods: {

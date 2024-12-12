@@ -119,9 +119,23 @@ button {
                     }
                     app.vue.selectedArea = event.overlay; // Store the new rectangle
                 }
-        );
-    });
-}
+            );
+
+            // Event listener for selecting map position
+            google.maps.event.addListener(
+                app.vue.maps,
+                "click",
+                function (event) {
+                    // app.vue.latitude = event.latLng.lat();
+                    // app.vue.longitude = event.latLng.lng();
+                    app.vue.latitude = 1;
+                    app.vue.longitude = 2;
+                }
+            );
+        });
+
+        
+    }
 
     window.initMap = initMap;
 </script>
