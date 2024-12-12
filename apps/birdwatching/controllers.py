@@ -29,11 +29,11 @@ from py4web import action, request, abort, redirect, URL
 from yatl.helpers import A
 from .common import db, session, T, cache, auth, logger, authenticated, unauthenticated, flash
 from py4web.utils.url_signer import URLSigner
-from .models import get_user_email
+from .models import get_user_email, get_time
 import urllib.parse
+import uuid
 
 url_signer = URLSigner(session)
-abcd = 8
 
 @action('index')
 @action.uses('index.html', db, auth.user, url_signer)
@@ -45,13 +45,14 @@ def index():
         get_species_trends_url = URL('get_species_trends', signer=url_signer),
         search_species_url = URL('search_species', signer=url_signer),
         heatmap_data_url = URL('heatmap_data', signer=url_signer),
+        add_checklist_url = URL('add_checklist', signer=url_signer),
     )
 
 @action('my_callback')
 @action.uses() # Add here things like db, auth, etc.
 def my_callback():
     # The return value should be a dictionary that will be sent as JSON.
-    return dict(my_value=abcd)
+    return dict(my_value=2)
 
 @action("stats", method=["GET"])
 @action.uses("stats.html", auth.user)
@@ -159,11 +160,42 @@ def heatmap_data():
     ''', [species_name], as_dict=True)
     return dict(data=rows)
 
-@action("checklist", method=["GET"])
+@action("checklist")
 @action.uses("checklist.html", db, auth.user)
 def checklist():
     return dict(
-        # COMPLETE: return here any signed URLs you need.
-        my_callback_url = URL('my_callback'),
-        
+        get_checklist_url = URL('get_checklist'),
+
     )
+
+@action("add_checklist", method="POST")
+@action.uses(db, auth.user)
+def add_checklist():
+    user_email = get_user_email()
+    latitude = request.json.get('latitude')
+    longitude = request.json.get('longitude')
+    current_sample_id = "S" + str(uuid.uuid4())
+    date_time = get_time()
+    db.checklists.insert(
+                sampling_event_id=current_sample_id,
+                latitude=float(latitude),
+                longitude=float(longitude),
+                observation_date=date_time.date(),
+                start_time=date_time.time().strftime("%H:%M:%S"),
+                observer_id=user_email,
+                duration_minutes=0,
+                )
+    return dict(c_id=current_sample_id)
+
+@action("get_checklist", method="POST")
+@action.uses(db, auth.user)
+def get_checklist():
+    # now = get_time().time().strftime("%H:%M:%S")
+    # current_sample_id = now
+    # return dict(current_sample_id=now)
+    user_email = get_user_email()
+    # shopping_list = db(db.shopping.user_email == user_email).select().as_list()
+    sample_id = request.json.get("sample_id")
+    alist = db((db.checklists.sampling_event_id == sample_id)).select().as_list()
+
+    return dict(list=alist)

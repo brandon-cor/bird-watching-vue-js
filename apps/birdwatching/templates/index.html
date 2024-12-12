@@ -55,8 +55,7 @@ button {
     
     <!-- Action Buttons -->
     <div class="buttons">
-        <button class="button is-primary" @click="checklist">Select Position</button>
-        <button class="button is-success" @click="checklist">Add Checklist</button>
+        <button class="button is-primary" @click="add_checklist">Select Position/Add Checklist</button>
         <a href="/birdwatching/stats" class="button is-link">My Birding Stats</a>
         <button @click="fetchStatistics" class="button is-success">Statistics on Region</button>
     </div>
@@ -69,6 +68,7 @@ button {
     let get_species_trends_url = "[[=XML(get_species_trends_url)]]";
     let search_species_url = "[[=XML(search_species_url)]]";
     let heatmap_data_url = "[[=XML(heatmap_data_url)]]";
+    let add_checklist_url = "[[=XML(add_checklist_url)]]";
 </script>
 <script>   
     // Initialize the map

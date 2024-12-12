@@ -43,11 +43,18 @@ app.data = {
                     console.error("Error fetching heatmap data:", error)
                 );
         },
-        checklist() {
+        add_checklist() {
             if (this.noMarker) {
                 this.add_marker();
             } else {
-                
+                let self = this;
+                axios.post(add_checklist_url, {
+                    latitude: self.latitude,
+                    longitude: self.longitude,
+                }).then(function (r) {
+                    window.location.href = `/birdwatching/checklist?c_id=${r.data.c_id}`;
+                });
+
             }
         },
         add_marker() {
