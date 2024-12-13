@@ -29,9 +29,11 @@ from py4web import action, request, abort, redirect, URL
 from yatl.helpers import A
 from .common import db, session, T, cache, auth, logger, authenticated, unauthenticated, flash
 from py4web.utils.url_signer import URLSigner
-from .models import get_user_email
+from .models import get_user_email, get_time
 import urllib.parse
+import uuid
 from settings_private import MAPS_API_KEY
+
 
 url_signer = URLSigner(session)
 
@@ -45,6 +47,7 @@ def index():
         get_species_trends_url = URL('get_species_trends', signer=url_signer),
         search_species_url = URL('search_species', signer=url_signer),
         heatmap_data_url = URL('heatmap_data', signer=url_signer),
+        add_checklist_url = URL('add_checklist', signer=url_signer),
         MAPS_API_KEY=MAPS_API_KEY
     )
 
@@ -52,7 +55,7 @@ def index():
 @action.uses() # Add here things like db, auth, etc.
 def my_callback():
     # The return value should be a dictionary that will be sent as JSON.
-    return dict(my_value=3)
+    return dict(my_value=2)
 
 @action("stats", method=["GET"])
 @action.uses("stats.html", auth.user)
@@ -160,3 +163,110 @@ def heatmap_data():
     ''', [species_name], as_dict=True)
     return dict(data=rows)
 
+@action("checklist")
+@action.uses("checklist.html", db, auth.user)
+def checklist():
+    return dict(
+        get_checklist_url = URL('get_checklist'),
+        search_species_url = URL('search_species'),
+        update_checklist_url = URL('update_checklist'),
+        delete_sighting_url = URL('delete_sighting')
+    )
+
+@action("add_checklist", method="POST")
+@action.uses(db, auth.user)
+def add_checklist():
+    user_email = get_user_email()
+    latitude = request.json.get('latitude')
+    longitude = request.json.get('longitude')
+    current_sample_id = "S" + str(uuid.uuid4())
+    date_time = get_time()
+    db.checklists.insert(
+                sampling_event_id=current_sample_id,
+                latitude=float(latitude),
+                longitude=float(longitude),
+                observation_date=date_time.date(),
+                start_time=date_time.time().strftime("%H:%M:%S"),
+                observer_id=user_email,
+                duration_minutes=0,
+                )
+    return dict(c_id=current_sample_id)
+
+@action("get_checklist", method="POST")
+@action.uses(db, auth.user)
+def get_checklist():
+    user_email = get_user_email()
+    sample_id = request.json.get("sample_id")
+    alist = db((db.checklists.sampling_event_id == sample_id) & (db.checklists.observer_id == user_email)).select().as_list()
+    blist = db(db.sightings.sampling_event_identifier == sample_id).select().as_list()
+    return dict(list=alist, sightings=blist)
+
+@action("update_checklist", method="POST")
+@action.uses(db, auth.user)
+def get_checklist():
+    user_email = get_user_email()
+    sightings = request.json.get("sightings")
+    sample_id = request.json.get("sample_id")
+    date = request.json.get("date")
+    start_time = request.json.get("start_time")
+    duration = request.json.get("duration")
+
+    # update checklist info
+    db((db.checklists.sampling_event_id == sample_id)).update(
+                # latitude=float(row[1]) if row[1] else None,  # Ensure this is a float
+                # longitude=float(row[2]) if row[2] else None,  # Ensure this is a float
+                observation_date=date,
+                start_time=start_time,
+                # observer_id=row[5] if row[5] else None,
+                duration_minutes=duration# Convert duration_minutes to an integer or set to None if empty
+            )
+
+    # update sightings
+    for sighting in sightings:
+        db.sightings.update_or_insert((db.sightings.sampling_event_identifier == sample_id) & (db.sightings.common_name == sighting["common_name"]),
+                                        sampling_event_identifier=sample_id,
+                                        common_name=sighting["common_name"],
+                                        observation_count=sighting["observation_count"])
+
+    return dict()
+
+@action('delete_sighting', method="POST")
+@action.uses(db, auth.user)
+def delete_sighting():
+    sample_id = request.json.get('sample_id')
+    name = request.json.get('name')
+    db((db.sightings.sampling_event_identifier == sample_id) & (db.sightings.common_name == name)).delete()
+    return "ok"
+
+@action("mychecklist")
+@action.uses("mychecklist.html", db, auth.user)
+def mychecklist():
+    return dict(
+        get_checklist_url = URL('get_checklist'),
+        search_species_url = URL('search_species'),
+        update_checklist_url = URL('update_checklist'),
+        delete_sighting_url = URL('delete_sighting'),
+        load_checklists_url = URL('load_checklists'),
+        delete_checklist_url = URL('delete_checklist')
+    )
+
+@action("load_checklists")
+@action.uses(db, auth.user)
+def load_checklists():
+    user_email = get_user_email()
+    user_checklists = db((db.checklists.observer_id == user_email)).select().as_list()
+
+    # load sightings for each checklist
+    for user in user_checklists:
+        user["sightings"] = db(db.sightings.sampling_event_identifier == user["sampling_event_id"]).select().as_list()
+        
+
+    return dict(checklists=user_checklists)
+
+@action('delete_checklist', method="POST")
+@action.uses(db, auth.user)
+def delete_sighting():
+    sample_id = request.json.get('sample_id')
+    db((db.sightings.sampling_event_identifier == sample_id)).delete()
+    db((db.checklists.sampling_event_id == sample_id)).delete()
+    return "ok"

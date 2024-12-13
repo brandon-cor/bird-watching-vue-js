@@ -9,15 +9,85 @@
 
 <div class="section" id="app" v-cloak>
   <!-- Put here your Vue.js template -->
-  <h1 class="title"><i class="fa-solid fa-cube"></i> Title</h1>
-  <p>Content: my_value: {{my_value}} </p>
+  <h1 class="title">Checklist</h1>
+ 
+  <!-- Checklist Information -->
+  <div class="block">
+    <div class="columns">
+      <div class="column">
+        <label class="label has-text-centered">Date</label>
+        <input type="text" class="input has-text-centered" placeholder="date" v-model="date"/>
+      </div>
+      <div class="column">
+        <label class="label has-text-centered">Start Time</label>
+        <input type="text" class="input has-text-centered" placeholder="time" v-model="start_time"/>
+      </div>
+      <div class="column">
+        <label class="label has-text-centered">Duration</label>
+        <input type="text" class="input has-text-centered" placeholder="Duration" v-model="duration"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="columns">
+      <div class="column is-one-third">
+        <div class="control block">
+          <input class="input" type="text" placeholder="Search Species" v-model="query" @keyup="search" />
+        </div>
+      
+        <div class="button is-inverted is-primary is-fullwidth" v-for="r in search_results" @click="add_species(r.name)">{{r.name}}</div>
+
+      </div>
+      <div class="column">
+        <table class="table is-fullwidth">
+          <thead>
+            <tr>
+              <th>Species</th>
+              <th>Count</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(s, index) in sightings">
+              <th>{{ s.common_name }}</th>
+              <th><input class="input is-small" v-model='s.observation_count'></th>
+              <th>
+                <div class="buttons is-centered">
+                  <button class="button is-small" @click="add_species(s.common_name)">
+                      <span class="icon"><i class="fa fa-plus"></i></span>
+                  </button>
+                  <button class="button is-small" @click="minus_species(index)">
+                      <span class="icon"><i class="fa fa-minus"></i></span>
+                  </button>
+                </div>
+              </th>
+            </tr>
+          </tbody>
+        </table>
+
+        <button class="button is-success is-fullwidth" @click="update_checklist">
+          Submit
+        </button>
+
+      </div>
+  
+    </div>
+    
+  </div>
+  
 </div>
+
+
 
 
 [[block page_scripts]]
 <!-- Loads the index-specific js for Vue -->
 <script>
-  let my_callback_url = "[[=XML(my_callback_url)]]";
+  let get_checklist_url = "[[=XML(get_checklist_url)]]";
+  let search_species_url = "[[=XML(search_species_url)]]";
+  let update_checklist_url = "[[=XML(update_checklist_url)]]";
+  let delete_sighting_url = "[[=XML(delete_sighting_url)]]";
 </script>
 <script src="js/checklist.js"></script>
 [[end]]

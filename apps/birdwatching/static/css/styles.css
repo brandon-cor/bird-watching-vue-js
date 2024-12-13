@@ -129,3 +129,12 @@ body {
     text-decoration: underline;
   }
   
+  .dropdown {
+    width: 100%;
+  
+    .dropdown-trigger {
+      width: 100%
+    }
+  
+  
+  }
