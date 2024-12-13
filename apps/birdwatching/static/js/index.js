@@ -20,7 +20,6 @@ app.data = {
         load_heatmap_data() {
             fetch(`${heatmap_data_url}?species_name=${encodeURIComponent(this.searchQuery)}`)
             .then((response) => {
-                    console.log(response);
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
