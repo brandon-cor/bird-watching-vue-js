@@ -31,6 +31,7 @@ from .common import db, session, T, cache, auth, logger, authenticated, unauthen
 from py4web.utils.url_signer import URLSigner
 from .models import get_user_email
 import urllib.parse
+from settings_private import MAPS_API_KEY
 
 url_signer = URLSigner(session)
 
@@ -44,6 +45,7 @@ def index():
         get_species_trends_url = URL('get_species_trends', signer=url_signer),
         search_species_url = URL('search_species', signer=url_signer),
         heatmap_data_url = URL('heatmap_data', signer=url_signer),
+        MAPS_API_KEY=MAPS_API_KEY
     )
 
 @action('my_callback')
