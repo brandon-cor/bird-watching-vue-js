@@ -6,3 +6,4 @@ apps/.service/*
 .env
 py4web.sh
 .DS_Store
+settings_private.py

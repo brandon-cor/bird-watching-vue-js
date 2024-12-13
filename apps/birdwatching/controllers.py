@@ -32,6 +32,8 @@ from py4web.utils.url_signer import URLSigner
 from .models import get_user_email, get_time
 import urllib.parse
 import uuid
+from settings_private import MAPS_API_KEY
+
 
 url_signer = URLSigner(session)
 
@@ -46,6 +48,7 @@ def index():
         search_species_url = URL('search_species', signer=url_signer),
         heatmap_data_url = URL('heatmap_data', signer=url_signer),
         add_checklist_url = URL('add_checklist', signer=url_signer),
+        MAPS_API_KEY=MAPS_API_KEY
     )
 
 @action('my_callback')
