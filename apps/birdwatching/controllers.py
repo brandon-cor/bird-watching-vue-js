@@ -234,3 +234,36 @@ def delete_sighting():
     name = request.json.get('name')
     db((db.sightings.sampling_event_identifier == sample_id) & (db.sightings.common_name == name)).delete()
     return "ok"
+
+@action("mychecklist")
+@action.uses("mychecklist.html", db, auth.user)
+def mychecklist():
+    return dict(
+        get_checklist_url = URL('get_checklist'),
+        search_species_url = URL('search_species'),
+        update_checklist_url = URL('update_checklist'),
+        delete_sighting_url = URL('delete_sighting'),
+        load_checklists_url = URL('load_checklists'),
+        delete_checklist_url = URL('delete_checklist')
+    )
+
+@action("load_checklists")
+@action.uses(db, auth.user)
+def load_checklists():
+    user_email = get_user_email()
+    user_checklists = db((db.checklists.observer_id == user_email)).select().as_list()
+
+    # load sightings for each checklist
+    for user in user_checklists:
+        user["sightings"] = db(db.sightings.sampling_event_identifier == user["sampling_event_id"]).select().as_list()
+        
+
+    return dict(checklists=user_checklists)
+
+@action('delete_checklist', method="POST")
+@action.uses(db, auth.user)
+def delete_sighting():
+    sample_id = request.json.get('sample_id')
+    db((db.sightings.sampling_event_identifier == sample_id)).delete()
+    db((db.checklists.sampling_event_id == sample_id)).delete()
+    return "ok"

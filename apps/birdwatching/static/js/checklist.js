@@ -73,7 +73,7 @@ app.data = {
                 start_time: self.start_time,
                 duration: self.duration,
             }).then(function (r) {
-                
+                window.location.href = `/birdwatching/mychecklist`;
             });
             // window.location.href = `/birdwatching/index`;
         }

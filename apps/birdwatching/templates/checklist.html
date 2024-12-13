@@ -10,8 +10,7 @@
 <div class="section" id="app" v-cloak>
   <!-- Put here your Vue.js template -->
   <h1 class="title">Checklist</h1>
-  <!-- <p>Content: checklist_id: {{ checklist_id }} </p>
-  <p>Content: from_url: {{ from_url }} </p> -->
+ 
   <!-- Checklist Information -->
   <div class="block">
     <div class="columns">
@@ -33,16 +32,6 @@
   <div class="block">
     <div class="columns">
       <div class="column is-one-third">
-        <!-- <div class="dropdown is-active">
-          <div class="dropdown-trigger">
-            <div class="field" aria-haspopup="true" aria-controls="dropdown-menu2">
-                <input type="text" placeholder="Search Species" class="input" v-model="query" @keyup="search"/>
-              </div>
-          </div>
-          <div class="dropdown-menu">
-              <div class="dropdown-item" v-for="r in search_results">{{ r.name }}</div>
-          </div>
-        </div> -->
         <div class="control block">
           <input class="input" type="text" placeholder="Search Species" v-model="query" @keyup="search" />
         </div>
@@ -84,13 +73,6 @@
       </div>
   
     </div>
-    <!-- Better Search Bar -->
-    
-  </div>
-
-  <div class="block">
-    
-    
     
   </div>
   
