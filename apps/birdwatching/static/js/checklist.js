@@ -9,11 +9,14 @@ app.data = {
     data: function() {
         return {
             checklist: [],
+            sample_id: null,
             date: null,
             start_time: null,
             duration: null,
             query: "",
             search_results: [],
+            sightings: [],
+            
 
         };
     },
@@ -33,6 +36,31 @@ app.data = {
             } else {
                 self.search_results = [];
             }
+        },
+        add_species: function(species) {
+            let temp = this.sightings.find(dict => dict.common_name === species);
+            if (temp) {
+                temp.observation_count = temp.observation_count + 1;
+            } else {
+                this.sightings.push({
+                    sampling_event_identifier: this.sample_id,
+                    common_name: species,
+                    observation_count: 1
+                });
+            }
+        },
+        update_checklist: function() {
+            let self = this;
+            axios.post(update_checklist_url, {
+                sightings: self.sightings,
+                sample_id: self.sample_id,
+                date: self.date,
+                start_time: self.start_time,
+                duration: self.duration,
+            }).then(function (r) {
+                
+            });
+            // window.location.href = `/birdwatching/index`;
         }
     },
     // mounted: {
@@ -51,7 +79,8 @@ app.data = {
 app.vue = Vue.createApp(app.data).mount("#app");
 
 app.load_data = function () {
-    let urlParams = new URLSearchParams(window.location.search)
+    let urlParams = new URLSearchParams(window.location.search);
+    app.vue.sample_id = urlParams.get('c_id');
     axios.post(get_checklist_url, {
         sample_id: urlParams.get('c_id'),
     }).then(function (r) {
@@ -64,6 +93,7 @@ app.load_data = function () {
             alert("Error: You do not have permission to edit this checklist");
             window.location.href = `/birdwatching/index`;
         }
+        app.vue.sightings = r.data.sightings;
     });
     
     
@@ -71,4 +101,3 @@ app.load_data = function () {
 }
 
 app.load_data();
-

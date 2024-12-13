@@ -166,7 +166,7 @@ def checklist():
     return dict(
         get_checklist_url = URL('get_checklist'),
         search_species_url = URL('search_species'),
-
+        update_checklist_url = URL('update_checklist')
     )
 
 @action("add_checklist", method="POST")
@@ -191,11 +191,37 @@ def add_checklist():
 @action("get_checklist", method="POST")
 @action.uses(db, auth.user)
 def get_checklist():
-    # now = get_time().time().strftime("%H:%M:%S")
-    # current_sample_id = now
-    # return dict(current_sample_id=now)
     user_email = get_user_email()
     sample_id = request.json.get("sample_id")
     alist = db((db.checklists.sampling_event_id == sample_id) & (db.checklists.observer_id == user_email)).select().as_list()
-    # blist = db(db.species.name).select().as_list()
-    return dict(list=alist)
+    blist = db(db.sightings.sampling_event_identifier == sample_id).select().as_list()
+    return dict(list=alist, sightings=blist)
+
+@action("update_checklist", method="POST")
+@action.uses(db, auth.user)
+def get_checklist():
+    user_email = get_user_email()
+    sightings = request.json.get("sightings")
+    sample_id = request.json.get("sample_id")
+    date = request.json.get("date")
+    start_time = request.json.get("start_time")
+    duration = request.json.get("duration")
+
+    # update checklist info
+    db((db.checklists.sampling_event_id == sample_id)).update(
+                # latitude=float(row[1]) if row[1] else None,  # Ensure this is a float
+                # longitude=float(row[2]) if row[2] else None,  # Ensure this is a float
+                observation_date=date,
+                start_time=start_time,
+                # observer_id=row[5] if row[5] else None,
+                duration_minutes=duration# Convert duration_minutes to an integer or set to None if empty
+            )
+
+    # update sightings
+    for sighting in sightings:
+        db.sightings.update_or_insert((db.sightings.sampling_event_identifier == sample_id) & (db.sightings.common_name == sighting["common_name"]),
+                                        sampling_event_identifier=sample_id,
+                                        common_name=sighting["common_name"],
+                                        observation_count=sighting["observation_count"])
+
+    return dict()
