@@ -49,6 +49,21 @@ app.data = {
                 });
             }
         },
+        minus_species: function(index) {
+            let temp = this.sightings[index];
+            if (temp.observation_count == 1) {
+                let self = this;
+                axios.post(delete_sighting_url, {
+                    sample_id: self.sample_id,
+                    name: temp.common_name,
+                }).then(function (r) {
+                    self.sightings.splice(index, 1);
+                });
+            } else {
+                temp.observation_count = temp.observation_count - 1;
+            }
+
+        },
         update_checklist: function() {
             let self = this;
             axios.post(update_checklist_url, {
@@ -62,6 +77,7 @@ app.data = {
             });
             // window.location.href = `/birdwatching/index`;
         }
+        
     },
     // mounted: {
     //     // this.fetchSpecies();

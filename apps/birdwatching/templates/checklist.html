@@ -44,7 +44,7 @@
           </div>
         </div> -->
         <div class="control block">
-          <input class="input" type="text" v-model="query" @keyup="search" />
+          <input class="input" type="text" placeholder="Search Species" v-model="query" @keyup="search" />
         </div>
       
         <div class="button is-inverted is-primary is-fullwidth" v-for="r in search_results" @click="add_species(r.name)">{{r.name}}</div>
@@ -56,16 +56,23 @@
             <tr>
               <th>Species</th>
               <th>Count</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <th>Species</th>
-              <th>Count</th>
-            </tr>
-            <tr v-for="s in sightings">
+            <tr v-for="(s, index) in sightings">
               <th>{{ s.common_name }}</th>
-              <th>{{ s.observation_count }}</th>
+              <th><input class="input is-small" v-model='s.observation_count'></th>
+              <th>
+                <div class="buttons is-centered">
+                  <button class="button is-small" @click="add_species(s.common_name)">
+                      <span class="icon"><i class="fa fa-plus"></i></span>
+                  </button>
+                  <button class="button is-small" @click="minus_species(index)">
+                      <span class="icon"><i class="fa fa-minus"></i></span>
+                  </button>
+                </div>
+              </th>
             </tr>
           </tbody>
         </table>
@@ -98,6 +105,7 @@
   let get_checklist_url = "[[=XML(get_checklist_url)]]";
   let search_species_url = "[[=XML(search_species_url)]]";
   let update_checklist_url = "[[=XML(update_checklist_url)]]";
+  let delete_sighting_url = "[[=XML(delete_sighting_url)]]";
 </script>
 <script src="js/checklist.js"></script>
 [[end]]

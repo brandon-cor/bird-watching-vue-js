@@ -166,7 +166,8 @@ def checklist():
     return dict(
         get_checklist_url = URL('get_checklist'),
         search_species_url = URL('search_species'),
-        update_checklist_url = URL('update_checklist')
+        update_checklist_url = URL('update_checklist'),
+        delete_sighting_url = URL('delete_sighting')
     )
 
 @action("add_checklist", method="POST")
@@ -225,3 +226,11 @@ def get_checklist():
                                         observation_count=sighting["observation_count"])
 
     return dict()
+
+@action('delete_sighting', method="POST")
+@action.uses(db, auth.user)
+def delete_sighting():
+    sample_id = request.json.get('sample_id')
+    name = request.json.get('name')
+    db((db.sightings.sampling_event_identifier == sample_id) & (db.sightings.common_name == name)).delete()
+    return "ok"
