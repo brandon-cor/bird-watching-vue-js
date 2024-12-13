@@ -4,7 +4,7 @@ This file defines the database models
 print("Models.py loaded.")
 
 
-import datetime
+from datetime import datetime
 from .common import db, Field, auth
 from pydal.validators import *
 
@@ -35,6 +35,18 @@ db.define_table(
     Field("observer_id", "string", label="Observer ID"),
     Field("duration_minutes", "double", label="Duration (Minutes)"),
 )
+
+
+db.define_table(
+    'regions',
+    Field('ne_lat', 'double'),
+    Field('ne_lng', 'double'),
+    Field('sw_lat', 'double'),
+    Field('sw_lng', 'double'),
+    Field('created_at', 'datetime', default=datetime.now),
+)
+
+
 
 # Sightings table
 db.define_table(
