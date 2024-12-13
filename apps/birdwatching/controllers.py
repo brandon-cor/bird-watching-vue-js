@@ -165,6 +165,7 @@ def heatmap_data():
 def checklist():
     return dict(
         get_checklist_url = URL('get_checklist'),
+        search_species_url = URL('search_species'),
 
     )
 
@@ -194,8 +195,7 @@ def get_checklist():
     # current_sample_id = now
     # return dict(current_sample_id=now)
     user_email = get_user_email()
-    # shopping_list = db(db.shopping.user_email == user_email).select().as_list()
     sample_id = request.json.get("sample_id")
-    alist = db((db.checklists.sampling_event_id == sample_id)).select().as_list()
-
+    alist = db((db.checklists.sampling_event_id == sample_id) & (db.checklists.observer_id == user_email)).select().as_list()
+    # blist = db(db.species.name).select().as_list()
     return dict(list=alist)

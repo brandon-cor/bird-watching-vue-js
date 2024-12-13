@@ -12,6 +12,7 @@
   <h1 class="title">Checklist</h1>
   <!-- <p>Content: checklist_id: {{ checklist_id }} </p>
   <p>Content: from_url: {{ from_url }} </p> -->
+  <!-- Checklist Information -->
   <div class="block">
     <div class="columns">
       <div class="column">
@@ -26,9 +27,18 @@
         <label class="label">Duration</label>
         <input type="text" class="input" placeholder="Duration" v-model="duration"/>
       </div>
-      
     </div>
   </div>
+
+  <!-- Search Bar -->
+  <div class="section" id="vue-target" v-cloak>
+    <div class="control block">
+      <input class="input" type="text" v-model="query" @keyup="search" />
+    </div>
+  
+    <div v-for="r in search_results">{{ r.name }}</div>
+  </div>
+
 </div>
 
 
@@ -36,6 +46,7 @@
 <!-- Loads the index-specific js for Vue -->
 <script>
   let get_checklist_url = "[[=XML(get_checklist_url)]]";
+  let search_species_url = "[[=XML(search_species_url)]]";
 </script>
 <script src="js/checklist.js"></script>
 [[end]]

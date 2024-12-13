@@ -8,22 +8,32 @@ let app = {};
 app.data = {    
     data: function() {
         return {
-            // Complete as you see fit.
-            checklist_id: null, // This is an example.
-            from_url: null,
             checklist: [],
             date: null,
             start_time: null,
             duration: null,
+            query: "",
+            search_results: [],
 
         };
     },
     methods: {
-        // Complete as you see fit.
-        my_function: function() {
-            // This is an example.
-            this.my_value += 1;
-        },
+        search: function () {
+            let self = this;
+            if (this.query.length > 0) {
+                // axios.post(get_checklist_url, {
+                //     query: self.query,
+                // }).then(function (r) {
+                //     app.vue.species = r.data.species;
+                // });
+                axios.get(search_species_url, {params: {q: app.vue.query}})
+                .then(function (r) {
+                    self.search_results = r.data.species;
+                });
+            } else {
+                self.search_results = [];
+            }
+        }
     },
     // mounted: {
     //     // this.fetchSpecies();
@@ -42,15 +52,21 @@ app.vue = Vue.createApp(app.data).mount("#app");
 
 app.load_data = function () {
     let urlParams = new URLSearchParams(window.location.search)
-    app.vue.from_url = urlParams.get('c_id');
     axios.post(get_checklist_url, {
         sample_id: urlParams.get('c_id'),
     }).then(function (r) {
         app.vue.checklist = r.data.list;
-        app.vue.date = r.data.list[0].observation_date;
-        app.vue.start_time = r.data.list[0].start_time;
-        app.vue.duration = r.data.list[0].duration_minutes;
+        if (r.data.list.length > 0) {
+            app.vue.date = r.data.list[0].observation_date;
+            app.vue.start_time = r.data.list[0].start_time;
+            app.vue.duration = r.data.list[0].duration_minutes;
+        } else {
+            alert("Error: You do not have permission to edit this checklist");
+            window.location.href = `/birdwatching/index`;
+        }
     });
+    
+    
     
 }
 
