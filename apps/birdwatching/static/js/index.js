@@ -12,6 +12,7 @@ app.data = {
             heatmap: null,
             drawingManager: null,
             selectedArea: null,
+            selectedBounds: null,
             heatmapData: [],
             searchQuery: "",
             latitude: null,
@@ -74,10 +75,19 @@ app.data = {
                 this.longitude = l.lng();
             });
             this.noMarker = false
+        },
+        showRegionStatistics() {
+            if (this.selectedBounds) {
+                const ne = this.selectedBounds.getNorthEast();
+                const sw = this.selectedBounds.getSouthWest();
+                const url = `/birdwatching/location?ne_lat=${ne.lat()}&ne_lng=${ne.lng()}&sw_lat=${sw.lat()}&sw_lng=${sw.lng()}`;
+                console.log(url)
+                window.location.href = url;
+            }
         }
     },
 };
-
+/* 
 // Initialize the map and add drawing functionality
 function initMap() {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -134,6 +144,8 @@ function initMap() {
         });
     });
 }
-
+ 
 window.initMap = initMap;
+*/
+
 app.vue = Vue.createApp(app.data).mount("#app");

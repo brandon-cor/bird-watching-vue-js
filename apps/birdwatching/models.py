@@ -36,17 +36,13 @@ db.define_table(
     Field("duration_minutes", "double", label="Duration (Minutes)"),
 )
 
-
-# db.define_table(
-#     'regions',
-#     Field('ne_lat', 'double'),
-#     Field('ne_lng', 'double'),
-#     Field('sw_lat', 'double'),
-#     Field('sw_lng', 'double'),
-#     Field('created_at', 'datetime', default=datetime.now),
-# )
-
-
+db.define_table(
+     'regions',
+     Field('ne_lat', 'double'),
+     Field('ne_lng', 'double'),
+     Field('sw_lat', 'double'),
+     Field('sw_lng', 'double'),
+ )
 
 # Sightings table
 db.define_table(

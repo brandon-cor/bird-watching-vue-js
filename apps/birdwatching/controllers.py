@@ -48,6 +48,7 @@ def index():
         search_species_url = URL('search_species', signer=url_signer),
         heatmap_data_url = URL('heatmap_data', signer=url_signer),
         add_checklist_url = URL('add_checklist', signer=url_signer),
+        save_region_url = URL('save_region', signer=url_signer),
         MAPS_API_KEY=MAPS_API_KEY
     )
 
@@ -271,26 +272,6 @@ def delete_sighting():
     db((db.checklists.sampling_event_id == sample_id)).delete()
     return "ok"
 
-@action('save_region', method="POST")
-@action.uses(db, session, auth.user)
-def save_region():
-    try:
-        ne_lat = float(request.json.get("ne_lat"))
-        ne_lng = float(request.json.get("ne_lng"))
-        sw_lat = float(request.json.get("sw_lat"))
-        sw_lng = float(request.json.get("sw_lng"))
-
-        # Save the region to the database
-        db.regions.insert(
-            ne_lat=ne_lat,
-            ne_lng=ne_lng,
-            sw_lat=sw_lat,
-            sw_lng=sw_lng,
-        )
-        return dict(success=True)
-    except Exception as e:
-        return dict(success=False, error=str(e))
-
 @action('location')
 @action.uses('location.html', db, auth, url_signer)
 def location():
@@ -311,3 +292,18 @@ def location():
         sw_lat = sw_lat,
         sw_lng = sw_lng,
     )
+    
+@action('save_region', method=["POST"])
+@action.uses(db)
+def save_region():
+    try:
+        ne_lat = float(request.json.get("ne_lat"))
+        ne_lng = float(request.json.get("ne_lng"))
+        sw_lat = float(request.json.get("sw_lat"))
+        sw_lng = float(request.json.get("sw_lng"))
+
+        # Save the region to the database
+        db.regions.insert(ne_lat=ne_lat, ne_lng=ne_lng, sw_lat=sw_lat, sw_lng=sw_lng)
+        return dict(success=True)
+    except Exception as e:
+        return dict(success=False, error=str(e))

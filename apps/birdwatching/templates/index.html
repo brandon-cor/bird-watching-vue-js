@@ -58,7 +58,7 @@ button {
         <button class="button is-primary" @click="add_checklist">Select Position/Add Checklist</button>
         <a href="/birdwatching/mychecklist" class="button is-link">My Checklist</a>
         <a href="/birdwatching/stats" class="button is-link">My Birding Stats</a>
-        <a href="/birdwatching/location" class="button is-link">Regions Information</a>
+        <button class="button is-link" @click="showRegionStatistics">Regions Information</button>
     </div>
 </div>
 
@@ -70,6 +70,7 @@ button {
     let search_species_url = "[[=XML(search_species_url)]]";
     let heatmap_data_url = "[[=XML(heatmap_data_url)]]";
     let add_checklist_url = "[[=XML(add_checklist_url)]]";
+    let save_region_url = "[[=XML(save_region_url)]]";
 </script>
 <script>   
     // Initialize the map
@@ -112,19 +113,30 @@ button {
             app.vue.drawingManager.setMap(app.vue.map);
 
             // Event listener for overlay complete
-            google.maps.event.addListener(
-                app.vue.drawingManager,
-                "overlaycomplete",
-                function (event) {
-                    if (app.vue.selectedArea) {
-                        app.vue.selectedArea.setMap(null); // Remove the existing rectangle
-                    }
-                    app.vue.selectedArea = event.overlay; // Store the new rectangle
-                }
-            );
+            google.maps.event.addListener(app.vue.drawingManager, "overlaycomplete", function (event) {
+            if (app.vue.selectedArea) {
+                app.vue.selectedArea.setMap(null); // Remove previous rectangle
+            }
+            app.vue.selectedArea = event.overlay; // Store new rectangle
 
+            // Get rectangle bounds
+            const bounds = event.overlay.getBounds();
+            const ne = bounds.getNorthEast();
+            const sw = bounds.getSouthWest();
+
+            // Send coordinates to the backend
+            axios.post(save_region_url, {
+                ne_lat: ne.lat(),
+                ne_lng: ne.lng(),
+                sw_lat: sw.lat(),
+                sw_lng: sw.lng(),
+            }).then(() => {
+                alert("Region coordinates saved successfully!");
+            }).catch((error) => {
+                console.error("Error saving coordinates:", error);
+            });
         });
-
+    });
         
     }
 
@@ -135,4 +147,5 @@ button {
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=[[=XML(MAPS_API_KEY)]]&loading=async&libraries=visualization,drawing&callback=initMap"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="js/index.js"></script>
+
 [[end]]
