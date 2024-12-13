@@ -1,8 +1,12 @@
 # Project Contributions
 
-Mohan - Stats page and helped develop database schema
+Mohan - Stats page and helped develop database schema.
 
-Soham - Index page, got Maps API key from Google, helped debug issues in database schema
+Soham - Index page, got Maps API key from Google, helped debug issues in database schema.
+
+Ethan - Developed schema, helped fix git merge conflicts, worked on the checklist page. 
+
+Brandon - Created repo, developed schema, helped fix git merge conflicts, location page (partially functional, coordinates are saved but not visualized).
 
 # Project: Bird Watching App
 
