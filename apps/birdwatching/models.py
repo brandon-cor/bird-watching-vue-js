@@ -4,7 +4,7 @@ This file defines the database models
 print("Models.py loaded.")
 
 
-from datetime import datetime
+import datetime
 from .common import db, Field, auth
 from pydal.validators import *
 
@@ -37,14 +37,14 @@ db.define_table(
 )
 
 
-db.define_table(
-    'regions',
-    Field('ne_lat', 'double'),
-    Field('ne_lng', 'double'),
-    Field('sw_lat', 'double'),
-    Field('sw_lng', 'double'),
-    Field('created_at', 'datetime', default=datetime.now),
-)
+# db.define_table(
+#     'regions',
+#     Field('ne_lat', 'double'),
+#     Field('ne_lng', 'double'),
+#     Field('sw_lat', 'double'),
+#     Field('sw_lng', 'double'),
+#     Field('created_at', 'datetime', default=datetime.now),
+# )
 
 
 

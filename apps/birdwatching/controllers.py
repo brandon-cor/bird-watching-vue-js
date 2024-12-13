@@ -32,8 +32,6 @@ from py4web.utils.url_signer import URLSigner
 from .models import get_user_email, get_time
 import urllib.parse
 import uuid
-from datetime import datetime
-
 from .settings_private import MAPS_API_KEY
 
 
