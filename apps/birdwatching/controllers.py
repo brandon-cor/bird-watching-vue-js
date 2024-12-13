@@ -32,13 +32,13 @@ from py4web.utils.url_signer import URLSigner
 from .models import get_user_email, get_time
 import urllib.parse
 import uuid
-from settings_private import MAPS_API_KEY
+from .settings_private import MAPS_API_KEY
 
 
 url_signer = URLSigner(session)
 
 @action('index')
-@action.uses('index.html', db, auth.user, url_signer)
+@action.uses('index.html', db, auth, url_signer)
 def index():
     return dict(
         # COMPLETE: return here any signed URLs you need.

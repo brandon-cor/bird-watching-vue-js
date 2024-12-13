@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html>
+[[extend 'layout.html']]
+
 <head>
   <title>User Stats</title>
   <link rel="stylesheet" href="/birdwatching/static/css/styles.css" />
@@ -46,8 +46,15 @@
     <div v-else-if="!userStats.length" class="no-data">
       <p>No data available. Start by submitting a <a href="/birdwatching/checklist" class="link">checklist</a>!</p>
     </div>
+
+    <div class="buttons">
+      <a href="/birdwatching/index" class="button is-link">Index</a>
+      <a href="/birdwatching/mychecklist" class="button is-link">My Checklist</a>
+    </div>
+    
+
   </div>
 
   <script src="/birdwatching/static/js/stats.js"></script>
 </body>
-</html>
+[[end]]
