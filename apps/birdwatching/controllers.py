@@ -32,6 +32,8 @@ from py4web.utils.url_signer import URLSigner
 from .models import get_user_email, get_time
 import urllib.parse
 import uuid
+from datetime import datetime
+
 
 url_signer = URLSigner(session)
 
@@ -199,3 +201,44 @@ def get_checklist():
     alist = db((db.checklists.sampling_event_id == sample_id) & (db.checklists.observer_id == user_email)).select().as_list()
     # blist = db(db.species.name).select().as_list()
     return dict(list=alist)
+
+@action('save_region', method="POST")
+@action.uses(db, session, auth.user)
+def save_region():
+    try:
+        ne_lat = float(request.json.get("ne_lat"))
+        ne_lng = float(request.json.get("ne_lng"))
+        sw_lat = float(request.json.get("sw_lat"))
+        sw_lng = float(request.json.get("sw_lng"))
+
+        # Save the region to the database
+        db.regions.insert(
+            ne_lat=ne_lat,
+            ne_lng=ne_lng,
+            sw_lat=sw_lat,
+            sw_lng=sw_lng,
+        )
+        return dict(success=True)
+    except Exception as e:
+        return dict(success=False, error=str(e))
+
+@action('location')
+@action.uses('location.html', db, auth, url_signer)
+def location():
+    ne_lat = request.params.get('ne_lat')  # get values from url
+    ne_lng = request.params.get('ne_lng')  # 
+    sw_lat = request.params.get('sw_lat')  # 
+    sw_lng = request.params.get('sw_lng')  # 
+    
+    return dict(
+        # COMPLETE: return here any signed URLs you need.
+        load_sightings_url = URL('load_sightings'),
+        load_species_url = URL('load_species'),
+        load_info_url = URL('load_info'),
+        my_callback_url = URL('my_callback', signer=url_signer),
+        load_names_url = URL('load_names'),
+        ne_lat = ne_lat,
+        ne_lng = ne_lng,
+        sw_lat = sw_lat,
+        sw_lng = sw_lng,
+    )
